@@ -1,13 +1,13 @@
 ﻿#include <iostream>
-
+#include <excpt.h>
 int main()
 {
-	try
+	__try
 	{
 		double* ptr = nullptr; // create a null pointer 
 		std::cout << *ptr; // dereference a null pointer, exception will trigger
 	}
-	catch (const std::exception&) // catch does not work because dereferncing null pointer is undefined behaviour
+	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
 		std::cout << "It is nullptr" << std::endl;
 	}
