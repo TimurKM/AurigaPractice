@@ -1,29 +1,34 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string>
+#define COUNTOF(a) (sizeof(a) / sizeof(a[0]))
 
 int main()
 {
-	const char* str = "Hello, world!"; // it works correctly
-	std::cout << str << std::endl;
+	const char str[] = "Hello, world!";
+	const char* same_str = "Hello, world!";
+	std::cout << "Our str: " << str << std::endl;
 	char* p;
 	p = const_cast<char*>(str);
-	str = "Hello, new world!"; // changes work correctly
-	std::cout << str << std::endl;
-	std::cout << sizeof(str) << std::endl; // sizeof work correctly
-	// std::cout << _countof(str) << std::endl; // it doesn't work, I haven't found how to connect it through the library
+	p[0] = 'h';
+	std::cout << "Our new str: " << str << std::endl;
+	std::cout << "Sizeof: " << sizeof(str) << std::endl;
+	std::cout << "_countof for const char str[]: " << _countof(str) << std::endl;
+	// std::cout << _countof(same_str) << std::endl; // such way of _countof does not work
+	std::cout << "Own _countof for const char str[]: " << COUNTOF(str) << std::endl;
+	std::cout << "Own _countof for const char* same_str: " << COUNTOF(same_str) << std::endl; // such way of _countof works with warning
+	std::cout << "Strlen: " << strlen(str) << std::endl;
 
-	const wchar_t* str1 = L"Hello, world!";
-	std::wstring string(str1); // it does not work correctly, numbers are displayed instead of the phrase
-	std::cout << str1 << std::endl;
+	const wchar_t str1[] = L"Hello, world!";
+	const wchar_t* same_str1 = L"Hello, world!";
+	std::wcout << "Our str1: " << str1 << std::endl;
 	wchar_t* p1;
 	p1 = const_cast<wchar_t*>(str1);
-	str1 = L"Hello, new world!";
-	std::wstring string1(str1); // it does not work correctly, numbers are displayed instead of the phrase, , but they have changed
-	std::cout << str1 << std::endl;
-	std::cout << sizeof(str1) << std::endl; // sizeof work correctly
-	// std::cout << _countof(str1) << std::endl; // it doesn't work, I haven't found how to connect it through the library
-
-	system("pause");
+	p1[0] = L'h';
+	std::wcout << "Our new str1: " << str1 << std::endl;
+	std::wcout << "Sizeof: " << sizeof(str1) << std::endl;
+	std::wcout << "_countof for const wchar_t str1[]: " << _countof(str1) << std::endl;
+	// std::cout << _countof(same_str1) << std::endl; // such way of _countof does not work
+	std::wcout << "Own _countof for const wchar_t str1[]: " << COUNTOF(str1) << std::endl;
+	std::wcout << "Own _countof for const wchar_t* same_str1: " << COUNTOF(same_str1) << std::endl; // such way of _countof works with warning
+	std::wcout << "Strlen: " << wcslen(str1) << std::endl;
 	return 0;
 }
