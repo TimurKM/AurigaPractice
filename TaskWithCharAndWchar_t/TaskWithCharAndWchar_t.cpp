@@ -6,10 +6,6 @@ int main()
 	const char str[] = "Hello, world!";
 	const char* same_str = "Hello, world!";
 	std::cout << "Our str: " << str << std::endl;
-	char* p;
-	p = const_cast<char*>(str);
-	p[0] = 'h';
-	std::cout << "Our new str: " << str << std::endl;
 	std::cout << "Sizeof: " << sizeof(str) << std::endl;
 	std::cout << "_countof for const char str[]: " << _countof(str) << std::endl;
 	// std::cout << _countof(same_str) << std::endl; // such way of _countof does not work
@@ -20,10 +16,6 @@ int main()
 	const wchar_t str1[] = L"Hello, world!";
 	const wchar_t* same_str1 = L"Hello, world!";
 	std::wcout << "Our str1: " << str1 << std::endl;
-	wchar_t* p1;
-	p1 = const_cast<wchar_t*>(str1);
-	p1[0] = L'h';
-	std::wcout << "Our new str1: " << str1 << std::endl;
 	std::wcout << "Sizeof: " << sizeof(str1) << std::endl;
 	std::wcout << "_countof for const wchar_t str1[]: " << _countof(str1) << std::endl;
 	// std::cout << _countof(same_str1) << std::endl; // such way of _countof does not work
