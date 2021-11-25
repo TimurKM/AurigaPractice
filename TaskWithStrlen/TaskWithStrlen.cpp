@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 
-int strLength(char str[]) {
+int strLength(const char* str) {
 	int count = 0;
 	while (str[count] != '\0')
 	{
@@ -18,15 +18,9 @@ int main()
 
 	std::cout << strlen(str) << std::endl;
 
-	for (int i = 0; i < sizeof(str); i++)
-	{
-		if (str[i] == '\0')
-		{
-			str[i] = 'd';
-		}
-	}
+	str[sizeof(str) - 1] = 'd';
 
-	std::cout << strLength(str) << std::endl;
+	std::cout << strLength(str) << std::endl; // expectation of undefined behaviour
 
 	std::cout << strlen(str) << std::endl;
 
