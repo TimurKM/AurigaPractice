@@ -14,8 +14,6 @@ int main()
 	std::cout << "float:\t\t" << sizeof(float) << " bytes" << std::endl;
 	std::cout << "double:\t\t" << sizeof(double) << " bytes" << std::endl;
 	std::cout << "long double:\t" << sizeof(long double) << " bytes" << std::endl;
-	int* pi = new int[10];
-	size_t pointer_size = sizeof(pi);
-	std::cout << "pointer_size:\t" << sizeof(pointer_size) << " bytes" << std::endl;
+	std::cout << "int*:\t\t" << sizeof(int*) << " bytes" << std::endl;
 	return 0;
 }
