@@ -4,10 +4,16 @@
 int main()
 {
 	std::ofstream file;
-	char name[] = "";
+	std::string name = "";
 	std::cin >> name;
 	file.open(name);
-	file << "Hello world!";
+	if (!(file.is_open())) {
+		std::cout << "File is not found\n";
+		return -1;
+	}
+	else {
+		file << "Hello, world!";
+	}
 	file.close();
 
 	return 0;
