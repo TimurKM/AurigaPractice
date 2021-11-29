@@ -1,7 +1,4 @@
-#include <windows.h>
 #include <fstream>
-#include <string>
-#include <iostream>
 int main()
 {
 	wchar_t str[100];

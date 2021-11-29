@@ -1,7 +1,5 @@
 #include <windows.h>
 #include <string>
-#include <iostream>
-#include <errhandlingapi.h>
 int main()
 {
 	std::wstring name;
