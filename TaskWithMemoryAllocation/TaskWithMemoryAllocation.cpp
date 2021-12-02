@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	std::cout << argv[1] << std::endl;
-	size_t num = std::stoul(argv[1]);
+	auto num = std::stoull(argv[1]);
 	int* p;
 	try
 	{
