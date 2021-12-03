@@ -43,16 +43,17 @@ int main(int argc, char* argv[])
 		std::cout << "No command line arguments " << std::endl;
 		return 1;
 	}
-	int* array = new int[5];
-	for (size_t i = 1; i < 6; i++)
+	const int sizeOfArray = argc - 1;
+	int* array = new int[sizeOfArray];
+	for (size_t i = 1; i < sizeOfArray + 1; i++)
 	{
 		array[i - 1] = std::atoi(argv[i]);
 	}
-	std::cout << "The max in array is: " << searchMax(array, 5) << std::endl;
-	std::cout << "The min in array is: " << searchMin(array, 5) << std::endl;
-	bubbleSort(array, 5);
+	std::cout << "The max in array is: " << searchMax(array, sizeOfArray) << std::endl;
+	std::cout << "The min in array is: " << searchMin(array, sizeOfArray) << std::endl;
+	bubbleSort(array, sizeOfArray);
 	std::cout << "The sorted array is: " << std::endl;
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < sizeOfArray; i++) {
 		std::cout << array[i] << " ";
 	}
 	delete[] array;
