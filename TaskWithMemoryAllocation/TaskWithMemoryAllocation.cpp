@@ -9,7 +9,18 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 	std::cout << argv[1] << std::endl;
-	auto num = std::stoull(argv[1]);
+
+	unsigned long long num;
+	try
+	{
+		num = std::stoull(argv[1]);
+	}
+	catch (const std::invalid_argument& e)
+	{
+		std::cout << "Allocation failed words: " << e.what() << std::endl;
+		return -1;
+	}
+
 	int* p;
 	try
 	{
@@ -20,6 +31,7 @@ int main(int argc, char* argv[])
 		std::cout << "Allocation failed: " << e.what() << std::endl;
 		return -1;
 	}
+
 	std::cout << p << std::endl;
 	delete[] p;
 	return 0;
