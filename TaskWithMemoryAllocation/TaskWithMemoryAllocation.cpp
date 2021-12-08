@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 	}
 	catch (const std::invalid_argument& e)
 	{
-		std::cout << "Allocation failed words: " << e.what() << std::endl;
+		std::cout << "Parse failed: " << e.what() << std::endl;
 		return -1;
 	}
 
@@ -34,5 +34,6 @@ int main(int argc, char* argv[])
 
 	std::cout << p << std::endl;
 	delete[] p;
+	p = nullptr;
 	return 0;
 }
