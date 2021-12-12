@@ -1,17 +1,26 @@
-#include "String.h"
+#include "pch.h"
+#include "MyString.h"
 
 const char* String::c_str() const noexcept
 {
 	return m_str;
 }
+
 size_t String::length() const
 {
 	return m_len;
 }
+
 size_t String::size() const
 {
 	return m_len;
 }
+
+size_t String::capacity() const noexcept
+{
+	return m_capacity;
+}
+
 void String::resize(size_t n, char c)
 {
 	if (m_len > n)
@@ -37,6 +46,7 @@ void String::resize(size_t n, char c)
 		this->m_capacity = n + 1;
 	}
 }
+
 String& String::append(const String& str)
 {
 	if (str.length() == 0)
@@ -55,6 +65,7 @@ String& String::append(const String& str)
 	this->m_capacity = len + 1;
 	return *this;
 }
+
 String& String::operator=(const String& str)
 {
 	if (str.length() == 0)
@@ -73,11 +84,12 @@ String& String::operator=(const String& str)
 	this->m_capacity = len + 1;
 	return *this;
 }
+
 size_t String::copy(char* s, size_t len, size_t pos) const
 {
 	if (pos >= this->m_len)
 	{
-		throw std::out_of_range("pos >= this->m_len");
+		throw std::out_of_range("invalid string position");
 	}
 	char* start = &this->m_str[pos];
 	if (m_len < len + pos)
@@ -87,51 +99,84 @@ size_t String::copy(char* s, size_t len, size_t pos) const
 	std::memcpy(s, start, len - pos);
 	return len;
 }
-//size_t String::find(const String& str, size_t pos) const noexcept 
-//{
-//	for (size_t i = 0; i < m_len - str.length(); i++)
-//	{
-//		for (size_t j = 0; str[i + j] == m_str[j]; j++)
-//		{
-//
-//		}
-//	}
-//}
-size_t String::capacity() const noexcept
-{
-	return m_capacity;
-}
+
 const char& String::at(size_t pos) const
 {
-	for (size_t i = 0; i < m_len; i++)
+	if (pos < m_len)
 	{
-		std::cout << m_str[i];
+		return m_str[pos];
 	}
-	return '\0';
+	else
+	{
+		throw std::out_of_range("invalid string position");
+	}
 }
+
+char& String::at(size_t pos)
+{
+	if (pos < m_len)
+	{
+		return m_str[pos];
+	}
+	else
+	{
+		throw std::out_of_range("invalid string position");
+	}
+}
+
 const char& String::operator[](size_t pos) const
 {
-	for (size_t i = 0; i < m_len; i++)
-	{
-		std::cout << m_str[i];
-	}
-	return '\0';
+	return m_str[pos];
 }
-bool String::empty() const noexcept
+
+char& String::operator[](size_t pos)
 {
-	if (m_str != NULL)
+	return m_str[pos];
+}
+
+String& String::operator= (const char* s)
+{
+	delete[] m_str;
+	m_len = strlen(s);
+	m_capacity = m_len + 1;
+	m_str = new char[m_capacity];
+	std::memcpy(m_str, s, m_len);
+	m_str[m_len] = '\0';
+	return *this;
+}
+
+bool String::operator== (const String& str) const
+{
+	if (strcmp(this->m_str, str.m_str) == 0)
 	{
 		return true;
 	}
 	else
 		return false;
 }
+
+bool String::operator== (const char* s) const
+{
+	if (strcmp(this->m_str, s) == 0)
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
+bool String::empty() const noexcept
+{
+	return m_len == 0;
+}
+
 String::String()
 {
 	m_len = 0;
 	m_capacity = 0;
 	m_str = nullptr;
 }
+
 String::String(const std::string& str)
 {
 	m_len = str.length();
@@ -140,6 +185,7 @@ String::String(const std::string& str)
 	str.copy(m_str, str.length());
 	m_str[m_len] = '\0';
 }
+
 String::String(const String& str)
 {
 	m_len = str.length();
@@ -148,26 +194,46 @@ String::String(const String& str)
 	str.copy(m_str, str.length());
 	m_str[m_len] = '\0';
 }
-//String::String(const String& str, size_t pos, size_t len)
-//{
-//	std::cout << "Substring constructor: " << std::endl; // substring constructor
-//}
-//String::String(const char* s)
-//{
-//	std::cout << "From c-string constructor: " << std::endl; // from c-string constructor
-//}
-//String::String(const char* s, size_t n)
-//{
-//	std::cout << "From buffer constructor: " << std::endl; // from buffer constructor
-//}
-//String::String(size_t n, char c)
-//{
-//	std::cout << "Fill constructor: " << std::endl; // fill constructor
-//}
-//String::String(std::initializer_list<char> il)
-//{
-//	std::cout << "Initializer list constructor: " << std::endl; // initializer list constructor
-//}
+
+String::String(const String& str, size_t pos, size_t len)
+{
+	m_len = len;
+	m_capacity = m_len + 1;
+	m_str = new char[m_capacity];
+	std::memcpy(m_str, &str.m_str[pos], m_len);
+	m_str[m_len] = '\0';
+}
+
+String::String(const char* s)
+{
+	m_len = strlen(s);
+	m_capacity = m_len + 1;
+	m_str = new char[m_capacity];
+	std::memcpy(m_str, s, m_len);
+	m_str[m_len] = '\0';
+}
+
+String::String(const char* s, size_t n)
+{
+	m_len = n;
+	m_capacity = m_len + 1;
+	m_str = new char[m_capacity];
+	std::memcpy(m_str, s, m_len);
+	m_str[m_len] = '\0';
+}
+
+String::String(size_t n, char c)
+{
+	m_len = n;
+	m_capacity = m_len + 1;
+	m_str = new char[m_capacity];
+	for (size_t i = 0; i < m_len; i++)
+	{
+		m_str[i] = c;
+	}
+	m_str[n] = '\0';
+}
+
 String::~String() {
 	delete[] m_str;
 }
@@ -181,4 +247,8 @@ std::ostream& operator<<(std::ostream& os, String const& m) {
 	{
 		return os;
 	}
+}
+
+bool operator==(const char* s, const String& str) {
+	return str == s;
 }
