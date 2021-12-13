@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 
-int searchMax(int array[], size_t len) {
+int searchMax(int* array, size_t len) {
 	int max = array[0];
 	for (int i = 1; i < len; i++)
 	{
@@ -12,7 +12,7 @@ int searchMax(int array[], size_t len) {
 	return max;
 }
 
-int searchMin(int array[], size_t len) {
+int searchMin(int* array, size_t len) {
 	int min = array[0];
 	for (int i = 1; i < len; i++)
 	{
@@ -24,7 +24,7 @@ int searchMin(int array[], size_t len) {
 	return min;
 }
 
-void bubbleSort(int array[], size_t len) {
+void bubbleSort(int* array, size_t len) {
 	for (int i = 0; i < len - 1; i++) {
 		for (int j = 0; j < len - i - 1; j++) {
 			if (array[j] > array[j + 1]) {
