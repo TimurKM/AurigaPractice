@@ -1,106 +1,81 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string>
 #include <iostream>
-
-int main(int argc, char* argv[]) {
+#include "Socket.h"
+int main(int argc, char* argv[])
+{
 
 	WSADATA wsaData;
-	int iResult;
-	SOCKET ListenSocket = INVALID_SOCKET;
-	SOCKET ClientSocket = INVALID_SOCKET;
-	struct addrinfo* result = NULL;
-	struct addrinfo hints;
-	int iSendResult;
-	const int default_buflen = 1024;
-	const char* default_port = "8080";
-	fd_set rset;
 
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0)
 	{
 		std::cout << "WSAStartup failed: " << iResult << std::endl;
 	}
 
-	ZeroMemory(&hints, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
-
-	iResult = getaddrinfo(NULL, default_port, &hints, &result);
-	if (iResult != 0)
 	{
-		std::cout << "Getaddrinfo failed: " << iResult << std::endl;
-	}
-
-	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (ListenSocket == INVALID_SOCKET)
-	{
-		std::cout << "Error at socket(): " << WSAGetLastError() << std::endl;
-	}
-
-	iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-	if (iResult == SOCKET_ERROR)
-	{
-		std::cout << "Bind failed with error: " << WSAGetLastError() << std::endl;
-	}
-
-	freeaddrinfo(result);
-
-	iResult = listen(ListenSocket, SOMAXCONN);
-	if (iResult == SOCKET_ERROR)
-	{
-		std::cout << "Listen failed with error: " << WSAGetLastError() << std::endl;
-	}
-
-	FD_ZERO(&rset);
-	char recvbuf[default_buflen];
-	int recvbuflen = default_buflen;
-	int maxfdp1 = ListenSocket + 1;
-	for (;;)
-	{
-		FD_SET(ListenSocket, &rset);
-		int nready = select(maxfdp1, &rset, NULL, NULL, NULL);
-		if (FD_ISSET(ListenSocket, &rset))
+		Socket listenSocket{};
+		if (argc == 0)
 		{
-			ClientSocket = accept(ListenSocket, NULL, NULL);
-			if (ClientSocket == INVALID_SOCKET)
-			{
-				std::cout << "Accept failed: " << WSAGetLastError() << std::endl;
-				break;
-			}
+			std::cout << "No command line arguments, please, define " << std::endl;
+			return 1;
+		}
 
-			ZeroMemory(recvbuf, sizeof(recvbuf));
-			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0)
+		if (argc == 1)
+		{
+			std::cout << "Only one command line argument, please, define the second " << std::endl;
+			return 1;
+		}
+
+		unsigned long long port;
+		try
+		{
+			iResult = listenSocket.bind(argv[1], port = std::stoull(argv[2]));
+		}
+		catch (const std::invalid_argument& e)
+		{
+			std::cout << "Parse failed: " << e.what() << std::endl;
+			std::cout << "Please, check the types of parametrs " << std::endl;
+			return -1;
+		}
+		if (iResult == SOCKET_ERROR)
+		{
+			std::cout << "Bind failed with error: " << WSAGetLastError() << std::endl;
+		}
+		iResult = listenSocket.listen();
+		if (iResult == SOCKET_ERROR)
+		{
+			std::cout << "Listen failed with error: " << WSAGetLastError() << std::endl;
+		}
+		fd_set rset;
+		FD_ZERO(&rset);
+		int maxfdp1 = listenSocket.get() + 1;
+		for (;;)
+		{
+			FD_SET(listenSocket.get(), &rset);
+			int nready = select(maxfdp1, &rset, NULL, NULL, NULL);
+			if (FD_ISSET(listenSocket.get(), &rset))
 			{
-				std::cout << "Bytes received: " << iResult << std::endl;
-				puts(recvbuf);
-			}
-			else if (iResult == 0)
-			{
-				std::cout << "Connection closing..." << std::endl;
-			}
-			else
-			{
-				std::cout << "Recv failed: " << WSAGetLastError() << std::endl;
+				Socket clientSocket = Socket::accept(listenSocket);
+				std::vector<char> message(1024);
+				iResult = clientSocket.receive(message);
+				if (iResult > 0)
+				{
+					std::cout << "Bytes received: " << iResult << std::endl;
+					std::cout << message.data() << std::endl;
+				}
+				else if (iResult == 0)
+				{
+					std::cout << "Connection closing..." << std::endl;
+				}
+				else
+				{
+					std::cout << "Recv failed: " << WSAGetLastError() << std::endl;
+				}
 			}
 		}
 	}
 
-	iResult = shutdown(ListenSocket, SD_SEND);
-	if (iResult == SOCKET_ERROR)
-	{
-		std::cout << "Shutdown failed: %d\n" << WSAGetLastError() << std::endl;
-	}
-
-	closesocket(ListenSocket);
 	WSACleanup();
 	return 0;
 };
