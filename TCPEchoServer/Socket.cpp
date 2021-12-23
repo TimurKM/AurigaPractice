@@ -4,23 +4,23 @@
 #include <ws2tcpip.h>
 #include "Socket.h"
 
-Socket::Socket()
+Socket::Socket(int af, int type, int protocol)
 {
-	m_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	m_s = socket(af, type, protocol);
 }
 
 Socket::Socket(Socket&& other) noexcept
 {
 	m_s = other.m_s;
 	other.m_s = INVALID_SOCKET;
-};
+}
 
 Socket::Socket(SOCKET s)
 {
 	m_s = s;
 }
 
-int Socket::connect(const std::string& ip, u_short port)
+int Socket::connect(const std::string& ip, const u_short port, int af)
 {
 	sockaddr_in hints;
 
@@ -29,9 +29,8 @@ int Socket::connect(const std::string& ip, u_short port)
 	hints.sin_port = htons(port);
 
 	int iResult = ::connect(m_s, (SOCKADDR*)&hints, sizeof(hints));
-	if (iResult == SOCKET_ERROR) {
-		closesocket(m_s);
-		m_s = INVALID_SOCKET;
+	if (iResult == SOCKET_ERROR)
+	{
 		return WSAGetLastError();
 	}
 	return 0;
@@ -47,7 +46,7 @@ int Socket::send(const std::vector<char>& v, int flags)
 	return 0;
 }
 
-int Socket::bind(const std::string& ip, u_short port)
+int Socket::bind(const std::string& ip, const u_short port, int af)
 {
 	sockaddr_in hints;
 

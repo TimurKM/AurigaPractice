@@ -1,6 +1,12 @@
 ﻿#include "Socket.h"
 #include <iostream>
 
+int usage()
+{
+	std::cout << "Not all parametrs or wrong type" << std::endl;
+	return -1;
+}
+
 int main(int argc, char* argv[]) {
 
 	WSADATA wsaData;
@@ -13,33 +19,29 @@ int main(int argc, char* argv[]) {
 	if (iResult != 0)
 	{
 		std::cout << "WSAStartup failed: " << iResult << std::endl;
+		return -1;
 	}
 
 	{
 		Socket socket{};
-		if (argc == 0)
+		if (argc < 3)
 		{
-			std::cout << "No command line arguments, please, define " << std::endl;
-			return 1;
-		}
-
-		if (argc == 1)
-		{
-			std::cout << "Only one command line argument, please, define the second " << std::endl;
+			usage();
 			return 1;
 		}
 
 		unsigned long long port;
 		try
 		{
-			socket.connect(argv[1], port = std::stoull(argv[2]));
+			port = std::stoull(argv[2]);
 		}
 		catch (const std::invalid_argument& e)
 		{
 			std::cout << "Parse failed: " << e.what() << std::endl;
-			std::cout << "Please, check the types of parametrs " << std::endl;
+			usage();
 			return -1;
 		}
+		socket.connect(argv[1], port, AF_INET);
 		std::vector<char> v;
 		std::copy(s.begin(), s.end(), std::back_inserter(v));
 		v.push_back('\0');
