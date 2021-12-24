@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 
-class Figure
+template <typename T> class Figure
 {
 public:
 	Figure()
@@ -14,17 +14,16 @@ public:
 		std::cout << "~Figure()" << std::endl;
 	}
 
-	virtual const void what() = 0;
-	virtual const double area() = 0;
-	virtual const double perimeter() = 0;
+	virtual void what() const = 0;
+	virtual double area() const = 0;
+	virtual double perimeter() const = 0;
 };
 
-class Square final : public Figure
+class Square final : public Figure<double>
 {
 public:
-	Square(const double l)
+	Square(const double l) : m_length{ l }
 	{
-		m_length = l;
 		std::cout << "Square()" << std::endl;
 	}
 	virtual ~Square()
@@ -32,33 +31,31 @@ public:
 		std::cout << "~Square()" << std::endl;
 	}
 
-	void const what() override
+	void what() const override
 	{
 		std::cout << "I'm Square" << std::endl;
 	}
-	double const area() override
+	double area() const override
 	{
 		double area = m_length * m_length;
 		std::cout << area << std::endl;
 		return area;
 	}
-	double const perimeter() override
+	double perimeter() const override
 	{
 		double perimeter = 4 * m_length;
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
 private:
-	double m_length;
+	const double m_length;
 };
 
-class Rectangle final : public Figure
+class Rectangle final : public Figure<double>
 {
 public:
-	Rectangle(const double l, const double w)
+	Rectangle(const double l, const double w) : m_length{ l }, m_width{ w }
 	{
-		m_length = l;
-		m_width = w;
 		std::cout << "Rectangle()" << std::endl;
 	}
 	virtual ~Rectangle()
@@ -66,33 +63,32 @@ public:
 		std::cout << "~Rectangle()" << std::endl;
 	}
 
-	void const what() override
+	void what() const override
 	{
 		std::cout << "I'm Rectangle" << std::endl;
 	}
-	double const area() override
+	double area() const override
 	{
 		double area = m_length * m_width;
 		std::cout << area << std::endl;
 		return area;
 	}
-	double const perimeter() override
+	double perimeter() const override
 	{
 		double perimeter = 2 * (m_length + m_width);
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
 private:
-	double m_length;
-	double m_width;
+	const double m_length;
+	const double m_width;
 };
 
-class Circle final : public Figure
+class Circle final : public Figure<double>
 {
 public:
-	Circle(const double r)
+	Circle(const double r) : m_radius{ r }
 	{
-		m_radius = r;
 		std::cout << "Circle()" << std::endl;
 	}
 	virtual ~Circle()
@@ -100,24 +96,24 @@ public:
 		std::cout << "~Circle()" << std::endl;
 	}
 
-	void const what() override
+	void what() const override
 	{
 		std::cout << "I'm Circle" << std::endl;
 	}
-	double const area() override
+	double area() const override
 	{
 		double area = 3.14 * m_radius * m_radius;
 		std::cout << area << std::endl;
 		return area;
 	}
-	double const perimeter() override
+	double perimeter() const override
 	{
 		double perimeter = 2 * 3.14 * m_radius;
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
 private:
-	double m_radius;
+	const double m_radius;
 };
 
 int main(int argc, char* argv[])
@@ -126,7 +122,7 @@ int main(int argc, char* argv[])
 	auto r = std::make_shared<Rectangle>(2., 3.);
 	auto c = std::make_shared<Circle>(5.);
 
-	std::vector<std::shared_ptr<Figure>> v = { s, r, c };
+	std::vector<std::shared_ptr<Figure<double>>> v = { s, r, c };
 
 	for (auto& it : v)
 	{
