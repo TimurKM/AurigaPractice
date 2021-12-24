@@ -15,6 +15,14 @@ Socket::Socket(Socket&& other) noexcept
 	other.m_s = INVALID_SOCKET;
 }
 
+Socket& Socket::operator=(Socket&& other) noexcept
+{
+	SOCKET tmp = m_s;
+	m_s = other.m_s;
+	other.m_s = tmp;
+	return *this;
+}
+
 Socket::Socket(SOCKET s)
 {
 	m_s = s;
@@ -28,22 +36,12 @@ int Socket::connect(const std::string& ip, const u_short port, int af)
 	hints.sin_addr.s_addr = inet_addr(ip.c_str());
 	hints.sin_port = htons(port);
 
-	int iResult = ::connect(m_s, (SOCKADDR*)&hints, sizeof(hints));
-	if (iResult == SOCKET_ERROR)
-	{
-		return WSAGetLastError();
-	}
-	return 0;
+	return ::connect(m_s, (SOCKADDR*)&hints, sizeof(hints));
 }
 
 int Socket::send(const std::vector<char>& v, int flags)
 {
-	int iResult = ::send(m_s, v.data(), v.size(), flags);
-	if (iResult == SOCKET_ERROR)
-	{
-		return WSAGetLastError();
-	}
-	return 0;
+	return ::send(m_s, v.data(), v.size(), flags);
 }
 
 int Socket::bind(const std::string& ip, const u_short port, int af)
@@ -55,12 +53,7 @@ int Socket::bind(const std::string& ip, const u_short port, int af)
 	hints.sin_addr.s_addr = inet_addr(ip.c_str());
 	hints.sin_port = htons(port);
 
-	int iResult = ::bind(m_s, (SOCKADDR*)&hints, sizeof(hints));
-	if (iResult == SOCKET_ERROR)
-	{
-		return WSAGetLastError();
-	}
-	return 0;
+	return ::bind(m_s, (SOCKADDR*)&hints, sizeof(hints));
 }
 
 int Socket::listen(int backlog)

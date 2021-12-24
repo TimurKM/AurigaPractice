@@ -2,20 +2,21 @@
 #include <WinSock2.h>
 #include <string>
 #include <vector>
-class __declspec(dllexport) Socket
+
+#ifdef SOCKETDLL_EXPORTS
+#define SOCKETDLL_API __declspec(dllexport)
+#else
+#define SOCKETDLL_API __declspec(dllimport)
+#endif
+
+class SOCKETDLL_API Socket
 {
 public:
 	Socket(int af = AF_INET, int type = SOCK_STREAM, int protocol = IPPROTO_TCP);
 	Socket(const Socket& other) = delete;
 	Socket(Socket&& other) noexcept;
 	Socket& operator=(const Socket& other) = delete;
-	Socket& operator=(Socket&& other) noexcept
-	{
-		SOCKET tmp = m_s;
-		m_s = other.m_s;
-		other.m_s = tmp;
-		return *this;
-	}
+	Socket& operator=(Socket&& other) noexcept;
 	int connect(const std::string& ip = "127.0.0.1", const u_short port = 8080, int af = AF_INET);
 	int send(const std::vector<char>& v, int flags = NULL);
 	int bind(const std::string& ip = "127.0.0.1", const u_short port = 8080, int af = AF_INET);

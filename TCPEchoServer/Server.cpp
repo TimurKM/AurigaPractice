@@ -41,6 +41,10 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 		iResult = listenSocket.bind(argv[1], port, AF_INET);
+		if (iResult == SOCKET_ERROR)
+		{
+			std::cout << "Bind failed with error: " << WSAGetLastError() << std::endl;
+		}
 		iResult = listenSocket.listen();
 		if (iResult == SOCKET_ERROR)
 		{

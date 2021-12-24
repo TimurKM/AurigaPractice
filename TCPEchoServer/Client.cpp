@@ -41,7 +41,11 @@ int main(int argc, char* argv[]) {
 			usage();
 			return -1;
 		}
-		socket.connect(argv[1], port, AF_INET);
+		int iResult = socket.connect(argv[1], port, AF_INET);
+		if (iResult == SOCKET_ERROR)
+		{
+			std::cout << "Connection failed with error: " << WSAGetLastError() << std::endl;
+		}
 		std::vector<char> v;
 		std::copy(s.begin(), s.end(), std::back_inserter(v));
 		v.push_back('\0');
