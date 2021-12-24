@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <memory>
 #include <vector>
-
+#include <type_traits>
 template <typename T>
 class Figure
 {
@@ -18,6 +18,8 @@ public:
 	virtual void what() const = 0;
 	virtual T area() const = 0;
 	virtual T perimeter() const = 0;
+
+	static_assert(std::is_arithmetic<T>::value, "Template parameter must be numeric");
 };
 
 template <typename T>
@@ -49,6 +51,7 @@ public:
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
+	static_assert(std::is_arithmetic<T>::value, "Template parameter must be numeric");
 private:
 	const T m_length;
 };
@@ -82,6 +85,7 @@ public:
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
+	static_assert(std::is_arithmetic<T>::value, "Template parameter must be numeric");
 private:
 	const T m_length;
 	const T m_width;
@@ -116,6 +120,7 @@ public:
 		std::cout << perimeter << std::endl;
 		return perimeter;
 	}
+	static_assert(std::is_arithmetic<T>::value, "Template parameter must be numeric");
 private:
 	const T m_radius;
 };
