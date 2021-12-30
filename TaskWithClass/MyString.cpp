@@ -1,53 +1,53 @@
 #include "pch.h"
 #include "MyString.h"
 
-const char* String::c_str() const noexcept
+const char* MyString::c_str() const noexcept
 {
 	return m_str;
 }
 
-size_t String::length() const
+size_t MyString::length() const
 {
 	return m_len;
 }
 
-size_t String::size() const
+size_t MyString::size() const
 {
-	return m_len;
+	return length();
 }
 
-size_t String::capacity() const noexcept
+size_t MyString::capacity() const noexcept
 {
 	return m_capacity;
 }
 
-void String::resize(size_t n, char c)
+void MyString::resize(size_t n, char c)
 {
 	if (m_len > n)
 	{
 		m_str[n] = '\0';
-		this->m_len = n;
+		m_len = n;
 	}
 	else if (m_len < n)
 	{
-		char* mem = new char[n + 1];
-		memcpy(mem, m_str, m_len);
-		for (size_t i = m_len; i <= n - 1; i++)
+		if (m_capacity <= n)
 		{
-			mem[i] = c;
+			m_capacity = n + 1;
+			char* mem = new char[m_capacity];
+			this->copy(mem, this->length());
+			delete[] m_str;
+			m_str = mem;
 		}
-		mem[n] = '\0';
-		delete[] m_str;
-		this->m_str = mem;
-		if (c != '\0')
+		for (size_t i = m_len; i < n; i++)
 		{
-			this->m_len = n;
+			m_str[i] = c;
 		}
-		this->m_capacity = n + 1;
+		m_str[n] = '\0';
+		m_len = n;
 	}
 }
 
-String& String::append(const String& str)
+MyString& MyString::append(const MyString& str)
 {
 	if (str.length() == 0)
 	{
@@ -66,7 +66,7 @@ String& String::append(const String& str)
 	return *this;
 }
 
-String& String::operator=(const String& str)
+MyString& MyString::operator=(const MyString& str)
 {
 	if (str.length() == 0)
 	{
@@ -74,7 +74,7 @@ String& String::operator=(const String& str)
 	}
 	size_t len = this->length() + str.length();
 	char* mem = new char[len + 1];
-	this->copy(mem, this->length());
+	str.copy(mem, this->length());
 	char* start = &mem[this->length()];
 	str.copy(start, str.length());
 	mem[len] = '\0';
@@ -85,58 +85,51 @@ String& String::operator=(const String& str)
 	return *this;
 }
 
-size_t String::copy(char* s, size_t len, size_t pos) const
+size_t MyString::copy(char* s, size_t len, size_t pos) const
 {
-	if (pos >= this->m_len)
+	if (pos > this->m_len)
 	{
 		throw std::out_of_range("invalid string position");
 	}
 	char* start = &this->m_str[pos];
 	if (m_len < len + pos)
 	{
-		len = m_len;
+		len = m_len - pos;
 	}
-	std::memcpy(s, start, len - pos);
+	std::memcpy(s, start, len);
 	return len;
 }
 
-const char& String::at(size_t pos) const
+const char& MyString::at(size_t pos) const
 {
-	if (pos < m_len)
-	{
-		return m_str[pos];
-	}
-	else
+	if (pos >= m_len)
 	{
 		throw std::out_of_range("invalid string position");
 	}
+	return (*this)[pos];
 }
 
-char& String::at(size_t pos)
+char& MyString::at(size_t pos)
 {
-	if (pos < m_len)
-	{
-		return m_str[pos];
-	}
-	else
+	if (pos >= m_len)
 	{
 		throw std::out_of_range("invalid string position");
 	}
+	return (*this)[pos];
 }
 
-const char& String::operator[](size_t pos) const
+const char& MyString::operator[](size_t pos) const
 {
 	return m_str[pos];
 }
 
-char& String::operator[](size_t pos)
+char& MyString::operator[](size_t pos)
 {
 	return m_str[pos];
 }
 
-String& String::operator= (const char* s)
+MyString& MyString::operator= (const char* s)
 {
-	delete[] m_str;
 	m_len = strlen(s);
 	m_capacity = m_len + 1;
 	m_str = new char[m_capacity];
@@ -145,39 +138,30 @@ String& String::operator= (const char* s)
 	return *this;
 }
 
-bool String::operator== (const String& str) const
+bool MyString::operator== (const MyString& str) const
 {
-	if (strcmp(this->m_str, str.m_str) == 0)
-	{
-		return true;
-	}
-	else
-		return false;
+	return *this == str.m_str;
 }
 
-bool String::operator== (const char* s) const
+bool MyString::operator== (const char* s) const
 {
-	if (strcmp(this->m_str, s) == 0)
-	{
-		return true;
-	}
-	else
-		return false;
+	return (strcmp(this->m_str, s) == 0);
 }
 
-bool String::empty() const noexcept
+bool MyString::empty() const noexcept
 {
 	return m_len == 0;
 }
 
-String::String()
+MyString::MyString()
 {
+	m_capacity = 15;
+	m_str = new char[m_capacity];
+	m_str[0] = '\0';
 	m_len = 0;
-	m_capacity = 0;
-	m_str = nullptr;
 }
 
-String::String(const std::string& str)
+MyString::MyString(const std::string& str)
 {
 	m_len = str.length();
 	m_capacity = m_len + 1;
@@ -186,59 +170,41 @@ String::String(const std::string& str)
 	m_str[m_len] = '\0';
 }
 
-String::String(const String& str)
+MyString::MyString(const MyString& str) : MyString()
 {
-	m_len = str.length();
-	m_capacity = m_len + 1;
+	*this = str;
+}
+
+MyString::MyString(const MyString& str, size_t pos, size_t len) : MyString()
+{
+	m_capacity = str.capacity();
 	m_str = new char[m_capacity];
-	str.copy(m_str, str.length());
+	m_len = str.copy(m_str, len, pos);
 	m_str[m_len] = '\0';
 }
 
-String::String(const String& str, size_t pos, size_t len)
+MyString::MyString(const char* s)
 {
-	m_len = len;
-	m_capacity = m_len + 1;
-	m_str = new char[m_capacity];
-	std::memcpy(m_str, &str.m_str[pos], m_len);
-	m_str[m_len] = '\0';
+	*this = s;
 }
 
-String::String(const char* s)
+MyString::MyString(const char* s, size_t n)
 {
-	m_len = strlen(s);
-	m_capacity = m_len + 1;
-	m_str = new char[m_capacity];
-	std::memcpy(m_str, s, m_len);
-	m_str[m_len] = '\0';
+	*this = s;
+	this->resize(n);
 }
 
-String::String(const char* s, size_t n)
+MyString::MyString(size_t n, char c) : MyString()
 {
-	m_len = n;
-	m_capacity = m_len + 1;
-	m_str = new char[m_capacity];
-	std::memcpy(m_str, s, m_len);
-	m_str[m_len] = '\0';
+	this->resize(n, c);
 }
 
-String::String(size_t n, char c)
+MyString::~MyString()
 {
-	m_len = n;
-	m_capacity = m_len + 1;
-	m_str = new char[m_capacity];
-	for (size_t i = 0; i < m_len; i++)
-	{
-		m_str[i] = c;
-	}
-	m_str[n] = '\0';
-}
-
-String::~String() {
 	delete[] m_str;
 }
 
-std::ostream& operator<<(std::ostream& os, String const& m) {
+std::ostream& operator<<(std::ostream& os, MyString const& m) {
 	if (nullptr != m.m_str)
 	{
 		return os << m.m_str << ' ' << m.m_len;
@@ -249,6 +215,7 @@ std::ostream& operator<<(std::ostream& os, String const& m) {
 	}
 }
 
-bool operator==(const char* s, const String& str) {
+bool operator==(const char* s, const MyString& str)
+{
 	return str == s;
 }
