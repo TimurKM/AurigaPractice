@@ -33,7 +33,7 @@ void MyString::resize(size_t n, char c)
 		if (m_capacity <= n)
 		{
 			m_capacity = n + 1;
-			char* mem = new char[m_capacity];
+			auto mem = new char[m_capacity];
 			this->copy(mem, this->length());
 			delete[] m_str;
 			m_str = mem;
@@ -54,49 +54,49 @@ MyString& MyString::append(const MyString& str)
 		return *this;
 	}
 	size_t len = this->length() + str.length();
-	char* mem = new char[len + 1];
-	this->copy(mem, this->length());
-	char* start = &mem[this->length()];
-	str.copy(start, str.length());
-	mem[len] = '\0';
-	delete[] m_str;
-	this->m_str = mem;
-	this->m_len = len;
-	this->m_capacity = len + 1;
+	if (len >= m_capacity)
+	{
+		m_capacity = len + 1;
+		char* mem = new char[m_capacity];
+		this->copy(mem, this->length());
+		str.copy(&mem[this->length()], str.length());
+		delete[] m_str;
+		m_str = mem;
+	}
+	else
+	{
+		str.copy(&m_str[this->length()], str.length());
+	}
+	m_len = len;
+	m_str[m_len] = '\0';
 	return *this;
 }
 
 MyString& MyString::operator=(const MyString& str)
 {
-	if (str.length() == 0)
+	m_len = str.length();
+	if (m_capacity <= str.length())
 	{
-		return *this;
+		delete[] m_str;
+		m_capacity = m_len + 1;
+		m_str = new char[m_capacity];
 	}
-	size_t len = this->length() + str.length();
-	char* mem = new char[len + 1];
-	str.copy(mem, this->length());
-	char* start = &mem[this->length()];
-	str.copy(start, str.length());
-	mem[len] = '\0';
-	delete[] m_str;
-	this->m_str = mem;
-	this->m_len = len;
-	this->m_capacity = len + 1;
+	str.copy(m_str, m_len);
+	m_str[m_len] = '\0';
 	return *this;
 }
 
 size_t MyString::copy(char* s, size_t len, size_t pos) const
 {
-	if (pos > this->m_len)
+	if (pos > m_len)
 	{
 		throw std::out_of_range("invalid string position");
 	}
-	char* start = &this->m_str[pos];
 	if (m_len < len + pos)
 	{
 		len = m_len - pos;
 	}
-	std::memcpy(s, start, len);
+	std::memcpy(s, &m_str[pos], len);
 	return len;
 }
 
@@ -131,8 +131,12 @@ char& MyString::operator[](size_t pos)
 MyString& MyString::operator= (const char* s)
 {
 	m_len = strlen(s);
-	m_capacity = m_len + 1;
-	m_str = new char[m_capacity];
+	if (m_capacity <= m_len)
+	{
+		delete[] m_str;
+		m_capacity = m_len + 1;
+		m_str = new char[m_capacity];
+	}
 	std::memcpy(m_str, s, m_len);
 	m_str[m_len] = '\0';
 	return *this;
@@ -175,7 +179,7 @@ MyString::MyString(const MyString& str) : MyString()
 	*this = str;
 }
 
-MyString::MyString(const MyString& str, size_t pos, size_t len) : MyString()
+MyString::MyString(const MyString& str, size_t pos, size_t len)
 {
 	m_capacity = str.capacity();
 	m_str = new char[m_capacity];
@@ -183,12 +187,12 @@ MyString::MyString(const MyString& str, size_t pos, size_t len) : MyString()
 	m_str[m_len] = '\0';
 }
 
-MyString::MyString(const char* s)
+MyString::MyString(const char* s) : MyString()
 {
 	*this = s;
 }
 
-MyString::MyString(const char* s, size_t n)
+MyString::MyString(const char* s, size_t n) : MyString()
 {
 	*this = s;
 	this->resize(n);
