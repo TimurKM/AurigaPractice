@@ -4,9 +4,6 @@
 template <class T>
 class MyUniquePtr
 {
-private:
-	T* m_ptr = nullptr;
-	friend std::ostream& operator<<(std::ostream& os, MyUniquePtr const& m);
 public:
 	T* get() const noexcept
 	{
@@ -33,7 +30,7 @@ public:
 
 	MyUniquePtr() // default constructor
 	{
-		m_ptr = nullptr;
+		m_ptr;
 	}
 
 	MyUniquePtr(T* ptr)
@@ -54,7 +51,7 @@ public:
 
 	MyUniquePtr(MyUniquePtr&& obj) // move constructor
 	{
-		this->m_ptr = obj.m_ptr;
+		*this = obj;
 		obj.m_ptr = nullptr;
 	}
 
@@ -62,17 +59,14 @@ public:
 	{
 		delete m_ptr;
 	}
+private:
+	T* m_ptr = nullptr;
+	friend std::ostream& operator<<(std::ostream& os, MyUniquePtr const& m);
 };
 
 
 template <class T>
-std::ostream& operator<<(std::ostream& os, MyUniquePtr<T> const& m) {
-	if (nullptr != m.m_ptr)
-	{
-		return os << m.m_ptr;
-	}
-	else
-	{
-		return os;
-	}
+std::ostream& operator<<(std::ostream& os, MyUniquePtr<T> const& m)
+{
+	return m.m_ptr ? (os << m.m_ptr) : os;
 }

@@ -1,14 +1,14 @@
 #pragma once
 #include <iostream>
+// #include <atomic>
+#include <mutex> 
 
 template <class T>
 class MySharedPtr
 {
-private:
-	T* m_ptr = nullptr;
-	long* m_referencesCounter = nullptr;
-	friend std::ostream& operator<<(std::ostream& os, MySharedPtr const& m);
 public:
+	std::mutex mtx;
+
 	T* get()
 	{
 		return m_ptr;
@@ -16,12 +16,7 @@ public:
 
 	long use_count() const noexcept
 	{
-		if (m_referencesCounter != nullptr)
-		{
-			return *m_referencesCounter;
-		}
-		else
-			return 0;
+		return m_referencesCounter ? *m_referencesCounter : 0;
 	}
 
 	bool unique() const noexcept
@@ -33,12 +28,14 @@ public:
 	{
 		if (m_referencesCounter != nullptr)
 		{
-			(*m_referencesCounter)--;
+			mtx.lock();
+			(*m_referencesCounter) -= 1;
 			if (*m_referencesCounter == 0)
 			{
 				delete m_ptr;
 				delete m_referencesCounter;
 			}
+			mtx.unlock();
 		}
 		m_ptr = p;
 		m_referencesCounter = new long(1);
@@ -51,8 +48,8 @@ public:
 
 	MySharedPtr() // default constructor
 	{
-		m_ptr = nullptr;
-		m_referencesCounter = nullptr;
+		m_ptr;
+		m_referencesCounter;
 	}
 
 	MySharedPtr(T* ptr)
@@ -61,53 +58,71 @@ public:
 		m_referencesCounter = new long(1);
 	}
 
-	MySharedPtr(MySharedPtr& obj) // copy constructor 
+	MySharedPtr(const MySharedPtr& obj) // copy constructor 
 	{
 		m_ptr = obj.m_ptr;
 		m_referencesCounter = obj.m_referencesCounter;
+		mtx.lock();
 		if (obj.m_ptr != nullptr)
 		{
 			(*m_referencesCounter)++;
 		}
+		mtx.unlock();
 	}
 
 	MySharedPtr<T>& operator=(MySharedPtr<T>& obj) // copy assignment
 	{
-		reset(obj.m_ptr);
+		m_ptr = obj.m_ptr;
 		m_referencesCounter = obj.m_referencesCounter;
+		mtx.lock();
 		if (obj.m_ptr != nullptr)
 		{
 			(*m_referencesCounter)++;
 		}
+		mtx.unlock();
 		return *this;
 	}
 
-	MySharedPtr<T>& operator=(MySharedPtr<T>&& obj) = delete; // move assignment is deleted
+	MySharedPtr<T>& operator=(MySharedPtr<T>&& obj) // move assignment 
+	{
+		m_ptr = obj.m_ptr;
+		m_referencesCounter = obj.m_referencesCounter;
+		obj.m_ptr = nullptr;
+		obj.m_referencesCounter = nullptr;
+		return *this;
+	}
 
-	MySharedPtr(MySharedPtr&& obj) = delete; // move constructor is deleted
+	MySharedPtr(MySharedPtr&& obj) // move constructor 
+	{
+		m_ptr = obj.m_ptr;
+		m_referencesCounter = obj.m_referencesCounter;
+		obj.m_ptr = nullptr;
+		obj.m_referencesCounter = nullptr;
+	}
 
 	~MySharedPtr()
 	{
 		if (m_referencesCounter != nullptr)
 		{
-			(*m_referencesCounter)--;
+			mtx.lock();
+			(*m_referencesCounter) -= 1;
 			if (*m_referencesCounter == 0)
 			{
 				delete m_ptr;
 				delete m_referencesCounter;
 			}
+			mtx.unlock();
 		}
 	}
+private:
+	T* m_ptr = nullptr;
+	long* m_referencesCounter = nullptr;
+	// std::atomic<long*> m_referencesCounter = nullptr;
+	friend std::ostream& operator<<(std::ostream& os, MySharedPtr const& m);
 };
 
 template <class T>
-std::ostream& operator<<(std::ostream& os, MySharedPtr<T> const& m) {
-	if (nullptr != m.m_ptr)
-	{
-		return os << m.m_ptr;
-	}
-	else
-	{
-		return os;
-	}
+std::ostream& operator<<(std::ostream& os, MySharedPtr<T> const& m)
+{
+	return m.m_ptr ? (os << m.m_ptr) : os;
 }

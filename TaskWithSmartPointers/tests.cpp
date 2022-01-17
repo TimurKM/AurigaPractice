@@ -44,14 +44,11 @@ void sharedPtrRoutine()
 	assert(1 == another.use_count());
 
 	auto p = another.get();
-	one = another;
+	one = std::move(another);
 	assert(p == one.get());
-	//assert(nullptr == another.get());
-	assert(nullptr != another.get());
-	//assert(1 == one.use_count());
-	assert(2 == one.use_count());
-	//assert(0 == another.use_count());
-	assert(2 == another.use_count());
+	assert(nullptr == another.get());
+	assert(1 == one.use_count());
+	assert(0 == another.use_count());
 
 	one.reset(new int(2));
 	assert(nullptr != one.get());
