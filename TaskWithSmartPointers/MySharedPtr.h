@@ -7,8 +7,6 @@ template <class T>
 class MySharedPtr
 {
 public:
-	std::mutex mtx;
-
 	T* get()
 	{
 		return m_ptr;
@@ -28,14 +26,13 @@ public:
 	{
 		if (m_referencesCounter != nullptr)
 		{
-			mtx.lock();
+			std::unique_lock<std::mutex> ulock(m_mtx);
 			(*m_referencesCounter) -= 1;
 			if (*m_referencesCounter == 0)
 			{
 				delete m_ptr;
 				delete m_referencesCounter;
 			}
-			mtx.unlock();
 		}
 		m_ptr = p;
 		m_referencesCounter = new long(1);
@@ -48,8 +45,7 @@ public:
 
 	MySharedPtr() // default constructor
 	{
-		m_ptr;
-		m_referencesCounter;
+
 	}
 
 	MySharedPtr(T* ptr)
@@ -60,26 +56,18 @@ public:
 
 	MySharedPtr(const MySharedPtr& obj) // copy constructor 
 	{
-		m_ptr = obj.m_ptr;
-		m_referencesCounter = obj.m_referencesCounter;
-		mtx.lock();
-		if (obj.m_ptr != nullptr)
-		{
-			(*m_referencesCounter)++;
-		}
-		mtx.unlock();
+		*this = obj;
 	}
 
 	MySharedPtr<T>& operator=(MySharedPtr<T>& obj) // copy assignment
 	{
 		m_ptr = obj.m_ptr;
 		m_referencesCounter = obj.m_referencesCounter;
-		mtx.lock();
+		std::unique_lock<std::mutex> ulock(m_mtx);
 		if (obj.m_ptr != nullptr)
 		{
 			(*m_referencesCounter)++;
 		}
-		mtx.unlock();
 		return *this;
 	}
 
@@ -104,19 +92,19 @@ public:
 	{
 		if (m_referencesCounter != nullptr)
 		{
-			mtx.lock();
+			std::unique_lock<std::mutex> ulock(m_mtx);
 			(*m_referencesCounter) -= 1;
 			if (*m_referencesCounter == 0)
 			{
 				delete m_ptr;
 				delete m_referencesCounter;
 			}
-			mtx.unlock();
 		}
 	}
 private:
 	T* m_ptr = nullptr;
 	long* m_referencesCounter = nullptr;
+	std::mutex m_mtx;
 	// std::atomic<long*> m_referencesCounter = nullptr;
 	friend std::ostream& operator<<(std::ostream& os, MySharedPtr const& m);
 };

@@ -30,7 +30,7 @@ public:
 
 	MyUniquePtr() // default constructor
 	{
-		m_ptr;
+
 	}
 
 	MyUniquePtr(T* ptr)
@@ -44,7 +44,7 @@ public:
 
 	MyUniquePtr<T>& operator=(MyUniquePtr<T>&& obj) noexcept // move assignment
 	{
-		this->m_ptr = obj.m_ptr;
+		m_ptr = obj.m_ptr;
 		obj.m_ptr = nullptr;
 		return *this;
 	}
@@ -52,7 +52,6 @@ public:
 	MyUniquePtr(MyUniquePtr&& obj) // move constructor
 	{
 		*this = obj;
-		obj.m_ptr = nullptr;
 	}
 
 	~MyUniquePtr()
