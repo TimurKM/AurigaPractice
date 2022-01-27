@@ -42,10 +42,7 @@ public:
 		return *(this->m_ptr);
 	}
 
-	MySharedPtr() // default constructor
-	{
-
-	}
+	MySharedPtr() = default;
 
 	MySharedPtr(T* ptr)
 	{
@@ -63,12 +60,9 @@ public:
 		m_ptr = obj.m_ptr;
 		m_referencesCounter = obj.m_referencesCounter;
 		std::unique_lock<std::mutex> ulock(m_mtx);
-		if (obj.m_ptr != nullptr)
+		if (obj.m_referencesCounter != nullptr)
 		{
-			if (obj.m_referencesCounter != nullptr)
-			{
-				(*m_referencesCounter)++;
-			}
+			(*m_referencesCounter)++;
 		}
 		return *this;
 	}

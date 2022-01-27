@@ -28,10 +28,7 @@ public:
 		return *(this->m_ptr);
 	}
 
-	MyUniquePtr() // default constructor
-	{
-
-	}
+	MyUniquePtr() = default;
 
 	MyUniquePtr(T* ptr)
 	{
