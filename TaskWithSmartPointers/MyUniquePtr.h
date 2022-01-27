@@ -44,6 +44,10 @@ public:
 
 	MyUniquePtr<T>& operator=(MyUniquePtr<T>&& obj) noexcept // move assignment
 	{
+		/*	m_ptr = obj.m_ptr;
+			obj.m_ptr = nullptr;
+			return *this;*/
+		reset(m_ptr);
 		m_ptr = obj.m_ptr;
 		obj.m_ptr = nullptr;
 		return *this;

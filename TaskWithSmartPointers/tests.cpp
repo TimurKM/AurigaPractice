@@ -1,4 +1,8 @@
-﻿#include <memory>
+﻿#define _CRTDBG_MAP_ALOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <iostream>
+#include <memory>
 #undef NDEBUG
 #include <cassert>
 #include "MyUniquePtr.h"
@@ -68,5 +72,10 @@ int main(int argc, char* argv[])
 {
 	uniquePtrRoutine();
 	sharedPtrRoutine();
+	int* buf = new int[10];
+	buf[0] = 0;
+	buf[1] = buf[0];
+	std::cout << "Hello, World!\n" << buf[1];
+	_CrtDumpMemoryLeaks();
 	return 0;
 }

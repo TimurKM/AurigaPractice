@@ -1,6 +1,5 @@
 #pragma once
 #include <iostream>
-// #include <atomic>
 #include <mutex> 
 
 template <class T>
@@ -66,7 +65,10 @@ public:
 		std::unique_lock<std::mutex> ulock(m_mtx);
 		if (obj.m_ptr != nullptr)
 		{
-			(*m_referencesCounter)++;
+			if (obj.m_referencesCounter != nullptr)
+			{
+				(*m_referencesCounter)++;
+			}
 		}
 		return *this;
 	}
@@ -82,10 +84,7 @@ public:
 
 	MySharedPtr(MySharedPtr&& obj) // move constructor 
 	{
-		m_ptr = obj.m_ptr;
-		m_referencesCounter = obj.m_referencesCounter;
-		obj.m_ptr = nullptr;
-		obj.m_referencesCounter = nullptr;
+		*this = obj;
 	}
 
 	~MySharedPtr()
@@ -105,7 +104,6 @@ private:
 	T* m_ptr = nullptr;
 	long* m_referencesCounter = nullptr;
 	std::mutex m_mtx;
-	// std::atomic<long*> m_referencesCounter = nullptr;
 	friend std::ostream& operator<<(std::ostream& os, MySharedPtr const& m);
 };
 
