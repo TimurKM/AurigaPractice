@@ -25,15 +25,12 @@ public:
 
 	T& operator*()
 	{
-		return *(this->m_ptr);
+		return *m_ptr;
 	}
 
 	MyUniquePtr() = default;
 
-	MyUniquePtr(T* ptr)
-	{
-		m_ptr = ptr;
-	}
+	MyUniquePtr(T* ptr) : m_ptr(ptr) { }
 
 	MyUniquePtr(const MyUniquePtr& obj) = delete; // copy constructor is deleted
 
@@ -41,10 +38,7 @@ public:
 
 	MyUniquePtr<T>& operator=(MyUniquePtr<T>&& obj) noexcept // move assignment
 	{
-		/*	m_ptr = obj.m_ptr;
-			obj.m_ptr = nullptr;
-			return *this;*/
-		reset(m_ptr);
+		delete m_ptr;
 		m_ptr = obj.m_ptr;
 		obj.m_ptr = nullptr;
 		return *this;

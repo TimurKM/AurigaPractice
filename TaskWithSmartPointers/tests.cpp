@@ -1,15 +1,14 @@
-﻿#define _CRTDBG_MAP_ALOC
+﻿#define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <iostream>
 #include <memory>
 #undef NDEBUG
 #include <cassert>
 #include "MyUniquePtr.h"
 #include "MySharedPtr.h"
 
-typedef MyUniquePtr<int> UniquePtrType;
-typedef MySharedPtr<int> SharedPtrType;
+using UniquePtrType = MyUniquePtr<int>;//std::unique_ptr<int>;
+using SharedPtrType = MySharedPtr<int>;//std::shared_ptr<int>;
 
 void uniquePtrRoutine()
 {
@@ -70,12 +69,17 @@ void sharedPtrRoutine()
 
 int main(int argc, char* argv[])
 {
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	// Here we go
 	uniquePtrRoutine();
 	sharedPtrRoutine();
-	int* buf = new int[10];
-	buf[0] = 0;
-	buf[1] = buf[0];
-	std::cout << "Hello, World!\n" << buf[1];
-	_CrtDumpMemoryLeaks();
+
 	return 0;
 }
