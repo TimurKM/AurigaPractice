@@ -1,6 +1,7 @@
 ﻿#include "Socket.h"
 #include "WSA.h"
 #include <iostream>
+#include <thread>
 
 int usage(const std::string& exe)
 {
@@ -32,6 +33,7 @@ void handler(Socket& s, const unsigned id)
 	}
 }
 
+
 int run(const std::string& ip, const int port)
 {
 	std::shared_ptr<Socket> s = std::make_shared<Socket>();
@@ -56,12 +58,14 @@ int run(const std::string& ip, const int port)
 		if (1 == select(rset, wset, exceptset, NULL))
 		{
 			static unsigned id = 0;
-			handler(s->accept(), id++);
+			//handler(s->accept(), id++);
+			std::thread handlerThread(handler, s->accept(), id++);
+			handlerThread.detach();
 		}
 		else
 		{
 			std::cout << "select failed: " << WSA::getError() << std::endl;
-			break;
+			return -1;
 		}
 	}
 	return 0;
