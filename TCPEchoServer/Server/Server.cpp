@@ -1,84 +1,93 @@
-﻿#define WIN32_LEAN_AND_MEAN
-
+﻿#include "Socket.h"
+#include "WSA.h"
 #include <iostream>
-#include "Socket.h"
 
-int usage()
+int usage(const std::string& exe)
 {
-	std::cout << "Not all parametrs or wrong type" << std::endl;
+	std::cout << exe << ": <ip> <port>\n";
+	std::cout << "Where:\n" << "ip - IP address to bind\n";
+	std::cout << "port - Port to listen\n";
+	std::cout << "\nExample:\n" << exe << " 127.0.0.1 1055" << std::endl;
 	return -1;
+}
+
+void handler(Socket& s, const unsigned id)
+{
+	std::vector<char> msg(256);
+
+	std::cout << "Client " << id << ":";
+
+	int ret = s.recv(msg);
+	if (0 == ret)
+	{
+		std::cout << " Shutdown..." << std::endl;
+	}
+	else if (0 < ret)
+	{
+		std::cout << " Sent \"" << msg.data() << "\"" << std::endl;
+	}
+	else
+	{
+		std::cout << " recv failed " << WSA::getError() << std::endl;
+	}
+}
+
+int run(const std::string& ip, const int port)
+{
+	std::shared_ptr<Socket> s = std::make_shared<Socket>();
+
+	if (SOCKET_ERROR == s->bind(ip, port))
+	{
+		std::cout << "bind failed: " << WSA::getError() << std::endl;
+		return -1;
+	}
+
+	if (SOCKET_ERROR == s->listen())
+	{
+		std::cout << "listen failed: " << WSA::getError() << std::endl;
+		return -1;
+	}
+
+	std::cout << "Listening..." << std::endl;
+
+	SocketSet rset = { s }, wset, exceptset;
+	for (;;)
+	{
+		if (1 == select(rset, wset, exceptset, NULL))
+		{
+			static unsigned id = 0;
+			handler(s->accept(), id++);
+		}
+		else
+		{
+			std::cout << "select failed: " << WSA::getError() << std::endl;
+			break;
+		}
+	}
+	return 0;
 }
 
 int main(int argc, char* argv[])
 {
+	int port = -1;
 
-	WSADATA wsaData;
-
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0)
+	if (argc == 3)
 	{
-		std::cout << "WSAStartup failed: " << iResult << std::endl;
-		return -1;
-	}
-
-	{
-		Socket listenSocket{};
-		if (argc < 3)
-		{
-			usage();
-			return 1;
-		}
-
-		unsigned long long port;
 		try
 		{
-			port = std::stoull(argv[2]);
+			port = std::stoi(argv[2]);
 		}
-		catch (const std::invalid_argument& e)
+		catch (const std::invalid_argument&)
 		{
-			std::cout << "Parse failed: " << e.what() << std::endl;
-			usage();
-			return -1;
-		}
-		iResult = listenSocket.bind(argv[1], port, AF_INET);
-		if (iResult == SOCKET_ERROR)
-		{
-			std::cout << "Bind failed with error: " << WSAGetLastError() << std::endl;
-		}
-		iResult = listenSocket.listen();
-		if (iResult == SOCKET_ERROR)
-		{
-			std::cout << "Listen failed with error: " << WSAGetLastError() << std::endl;
-		}
-		fd_set rset;
-		FD_ZERO(&rset);
-		int maxfdp1 = listenSocket.get() + 1;
-		for (;;)
-		{
-			FD_SET(listenSocket.get(), &rset);
-			int nready = select(maxfdp1, &rset, NULL, NULL, NULL);
-			if (FD_ISSET(listenSocket.get(), &rset))
-			{
-				Socket clientSocket = Socket::accept(listenSocket);
-				std::vector<char> message(1024);
-				iResult = clientSocket.receive(message);
-				if (iResult > 0)
-				{
-					std::cout << "Bytes received: " << iResult << std::endl;
-					std::cout << message.data() << std::endl;
-				}
-				else if (iResult == 0)
-				{
-					std::cout << "Connection closing..." << std::endl;
-				}
-				else
-				{
-					std::cout << "Recv failed: " << WSAGetLastError() << std::endl;
-				}
-			}
 		}
 	}
 
-	WSACleanup();
-	return 0;
+	if (port < 0)
+	{
+		return usage(argv[0]);
+	}
+
+	WSA wsa;
+	wsa.init();
+	return run(argv[1], port);
 };

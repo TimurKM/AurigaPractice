@@ -1,57 +1,64 @@
 ﻿#include "Socket.h"
+#include "WSA.h"
 #include <iostream>
 
-int usage()
+int usage(const std::string &exe)
 {
-	std::cout << "Not all parametrs or wrong type" << std::endl;
+	std::cout << exe << ": <ip> <port>\n";
+	std::cout << "Where:\n" << "ip - IP address to connect\n";
+	std::cout << "port - Port to connect\n";
+	std::cout << "\nExample:\n" << exe << " 127.0.0.1 1055" << std::endl;
 	return -1;
 }
 
-int main(int argc, char* argv[]) {
-
-	WSADATA wsaData;
-
-	std::cout << "Input your name: ";
+int run(const std::string &ip, const int port)
+{
+	std::cout << "Input text: ";
 	std::string s;
 	std::cin >> s;
 
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (iResult != 0)
+	Socket socket;
+
+	if (SOCKET_ERROR == socket.connect(ip, port))
 	{
-		std::cout << "WSAStartup failed: " << iResult << std::endl;
+		std::cout << "connect failed: " << WSA::getError() << std::endl;
 		return -1;
 	}
 
-	{
-		Socket socket{};
-		if (argc < 3)
-		{
-			usage();
-			return 1;
-		}
+	std::vector<char> v;
+	std::copy(s.begin(), s.end(), std::back_inserter(v));
+	v.push_back('\0');
 
-		unsigned long long port;
-		try
-		{
-			port = std::stoull(argv[2]);
-		}
-		catch (const std::invalid_argument& e)
-		{
-			std::cout << "Parse failed: " << e.what() << std::endl;
-			usage();
-			return -1;
-		}
-		int iResult = socket.connect(argv[1], port, AF_INET);
-		if (iResult == SOCKET_ERROR)
-		{
-			std::cout << "Connection failed with error: " << WSAGetLastError() << std::endl;
-		}
-		std::vector<char> v;
-		std::copy(s.begin(), s.end(), std::back_inserter(v));
-		v.push_back('\0');
-		socket.send(v);
+	if (SOCKET_ERROR == socket.send(v))
+	{
+		std::cout << "send failed: " << WSA::getError() << std::endl;
+		return -1;
 	}
 
-	WSACleanup();
 	return 0;
+}
+
+int main(int argc, char* argv[])
+{
+	int port = -1;
+
+	if (argc == 3)
+	{	
+		try
+		{
+			port = std::stoi(argv[2]);
+		}
+		catch (const std::invalid_argument&)
+		{
+		}
+	}
+
+	if (port < 0)
+	{
+		return usage(argv[0]);
+	}
+
+	WSA wsa;
+	wsa.init();
+	return run(argv[1], port);
 }
