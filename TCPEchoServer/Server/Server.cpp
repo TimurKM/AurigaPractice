@@ -58,7 +58,6 @@ int run(const std::string& ip, const int port)
 		if (1 == select(rset, wset, exceptset, NULL))
 		{
 			static unsigned id = 0;
-			//handler(s->accept(), id++);
 			std::thread handlerThread(handler, s->accept(), id++);
 			handlerThread.detach();
 		}
