@@ -1,23 +1,39 @@
 ﻿#include <windows.h>
-#include <winreg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <vector>
 #include <iostream>
 
 int main()
 {
-	unsigned char pszName[256];
-	DWORD nNameLen = 256;
-	HKEY hkResult, hStartKey = HKEY_LOCAL_MACHINE;
-	long nResult = ERROR_SUCCESS;
-	nResult = RegOpenKeyEx(hStartKey, L"SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName", 0L, KEY_READ, &hkResult);
-	if (ERROR_SUCCESS == nResult)
+	HKEY key;
+
+	LPCWSTR keyName = L"SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ActiveComputerName";
+	long ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyName, 0, KEY_READ, &key);
+	if (ERROR_SUCCESS != ret)
 	{
-		nResult = RegQueryValueExA(hkResult, "ComputerName", 0, 0, pszName, &nNameLen);
-		if (ERROR_SUCCESS == nResult)
-		{
-			std::cout << pszName << std::endl;
-		}
+		std::wcout << L"RegOpenKeyEx failed: " << ret << std::endl;
+		return -1;
 	}
-	RegCloseKey(hkResult);
+
+	DWORD bufSize = 32;
+	std::vector<BYTE> buf(bufSize);
+
+	LPCWSTR valueName = L"ComputerName";
+	ret = RegQueryValueEx(key, valueName, NULL, NULL, buf.data(), &bufSize);
+	if (ERROR_MORE_DATA == ret)
+	{
+		buf.resize(bufSize);
+		ret = RegQueryValueEx(key, valueName, NULL, NULL, buf.data(), &bufSize);
+	}
+
+	if (ERROR_SUCCESS == ret)
+	{
+		std::wcout << L"Computer Name: " << reinterpret_cast<LPCWSTR>(buf.data()) << std::endl;
+	}
+	else
+	{
+		std::wcout << L"RegQueryValueEx failed: " << ret << std::endl;
+	}
+	RegCloseKey(key);
+
+	return 0;
 }
