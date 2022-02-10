@@ -1,50 +1,51 @@
 ﻿#include <windows.h>
-#include <conio.h>
 #include <iostream>
 #include <functional>
 
-TCHAR szName[] = TEXT("Global\\MyFileMappingObject");
-
 int main()
 {
-	HANDLE hMapFile;
-	DWORD* pBuf;
-
-	hMapFile = OpenFileMapping(
+	HANDLE h = OpenFileMapping(
 		FILE_MAP_ALL_ACCESS,
 		FALSE,
-		szName);
+		L"Global\\PidStore");
 
-	if (hMapFile == NULL)
+	if (NULL == h)
 	{
-		std::wcout << "Could not open file mapping object: " << GetLastError() << std::endl;
-		return 1;
+		std::cout << "OpenFileMapping failed: " << GetLastError() << std::endl;
+		return -1;
 	}
+	std::unique_ptr<void, std::function<void(HANDLE)>> hWrap(h, [](HANDLE h) { CloseHandle(h); });
 
-	DWORD dwWaitResult;
-
-	dwWaitResult = WaitForSingleObject(
-		hMapFile,
-		INFINITE);
-
-	pBuf = (DWORD*)MapViewOfFile(hMapFile,
+	DWORD* view = (DWORD*)MapViewOfFile(h,
 		FILE_MAP_ALL_ACCESS,
 		0,
 		0,
 		sizeof(DWORD));
 
-	if (pBuf == NULL)
+	if (NULL == view)
 	{
-		std::wcout << "Could not map view of file: " << GetLastError() << std::endl;
+		std::cout << "MapViewOfFile failed: " << GetLastError() << std::endl;
+		return -1;
+	}
+	std::unique_ptr<DWORD, std::function<void(DWORD*)>> viewWrap(view, [](DWORD* p) { UnmapViewOfFile(p); });
 
-		return 1;
+	HANDLE awareEvent = CreateEvent(NULL, TRUE, FALSE, L"Global\\SideBAwareEvent");
+	if (NULL == awareEvent)
+	{
+		std::cout << "CreateEvent failed: " << GetLastError() << std::endl;
+		return -1;
+	}
+	std::unique_ptr<void, std::function<void(HANDLE)>> awareEventWrap(awareEvent, [](HANDLE h) { CloseHandle(h); });
+
+	std::cout << "Pid of Side A: " << *view << std::endl;
+	*view = GetCurrentProcessId();
+	std::cout << "Pid of Side B: " << *view << std::endl;
+
+	if (!SetEvent(awareEvent))
+	{
+		std::cout << "SetEvent failed: " << GetLastError() << std::endl;
+		return -1;
 	}
 
-	DWORD pid = *reinterpret_cast<DWORD*>(pBuf);
-	std::cout << pid << std::endl;
-	_getch();
-	UnmapViewOfFile(pBuf);
-
-	std::unique_ptr<void, std::function<void(HANDLE)>> wrap(hMapFile, [](HANDLE h) { ::CloseHandle(h); });
 	return 0;
 }
