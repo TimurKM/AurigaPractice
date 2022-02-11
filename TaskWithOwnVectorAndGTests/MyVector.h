@@ -29,7 +29,7 @@ public:
 	{
 		if (pos >= m_size)
 		{
-			throw std::out_of_range("invalid vector subscript");
+			throw std::out_of_range("invalid vector<T> subscript");
 		}
 		return m_array[pos];
 	}
@@ -48,18 +48,19 @@ public:
 	{
 		if (m_capacity == m_size) return;
 		m_capacity = m_size;
-		T* new_m_array = new int[m_capacity];
-		for (int i = 0; i < m_size; i++)
+		T* newArray = new T[m_size];
+		for (size_t i = 0; i < m_size; i++)
 		{
-			new_m_array[i] = m_array[i];
+			newArray[i] = std::move(m_array[i]);
 		}
 		delete[] m_array;
-		m_array = new_m_array;
+		m_array = newArray;
 	}
 
 	void clear()
 	{
 		m_size = 0;
+		shrink_to_fit();
 	}
 
 	void push_back(const T& value)
@@ -71,46 +72,49 @@ public:
 		}
 		else
 		{
-			m_capacity *= 2;
-			T* new_m_array = new int[m_capacity];
-			for (int i = 0; i < m_size; i++)
+			m_capacity = m_capacity ? (2 * m_capacity) : 15;
+			T* newArray = new T[m_capacity];
+			for (size_t i = 0; i < m_size; i++)
 			{
-				new_m_array[i] = m_array[i];
+				newArray[i] = std::move(m_array[i]);
 			}
-			new_m_array[m_size] = value;
+			newArray[m_size] = value;
 			m_size++;
 			delete[] m_array;
-			m_array = new_m_array;
+			m_array = newArray;
 		}
 	}
 
 	void pop_back()
 	{
 		m_size--;
+		//m_array[m_size].~T(); // will cause problems with a real class
 	}
 
-	void resize(size_t count, const T& value = 100)
+	void resize(size_t count, const T& value)
 	{
 		if (m_size > count)
 		{
 			m_size = count;
+			// calling ~T() will cause problems with a real class
 		}
 		else if (m_size < count)
 		{
-			if (m_capacity <= count)
+			if (m_capacity < count)
 			{
-				T* new_data = new T[count];
+				m_capacity = count;
+				T* newArray = new T[m_capacity];
 				for (size_t i = 0; i < m_size; i++)
 				{
-					new_data[i] = m_array[i];
+					newArray[i] = std::move(m_array[i]);
 				}
-				for (size_t i = m_size; i < count; i++)
+				for (size_t i = m_size; i < m_capacity; i++)
 				{
-					new_data[i] = value;
+					newArray[i] = value;
 				}
 				delete[] m_array;
-				m_array = new_data;
-				m_size = count;
+				m_array = newArray;
+				m_size = m_capacity;
 			}
 			else
 			{
@@ -127,42 +131,23 @@ public:
 	{
 		m_size = 0;
 		m_capacity = 15;
-		m_array = new int[m_capacity];
+		m_array = new T[m_capacity];
 	}
 
 	MyVector(const MyVector<T>& obj) // copy constructor 
 	{
 		m_size = obj.m_size;
 		m_capacity = obj.m_capacity;
-		m_array = new int[m_capacity];
-		for (int i = 0; i < obj.m_size; i++)
+		m_array = new T[m_capacity];
+		for (size_t i = 0; i < obj.m_size; i++)
 		{
 			m_array[i] = obj.m_array[i];
 		}
 	}
 
-	MyVector<T>& operator=(const MyVector<T>& obj) // copy assignment
+	MyVector<T>& operator=(const std::initializer_list<T> obj)
 	{
-		if (obj.m_size > m_size)
-		{
-			m_capacity = obj.size();
-			delete[] m_array;
-			m_array = new int[m_capacity];
-		}
-		m_size = 0;
-		for (auto& it : obj) push_back(it);
-		return *this;
-	}
-
-	MyVector<T>& operator=(const std::initializer_list<T> obj) // copy assignment
-	{
-		if (obj.size() > m_size)
-		{
-			m_capacity = obj.size();
-			delete[] m_array;
-			m_array = new int[m_capacity];
-		}
-		m_size = 0;
+		clear();
 		for (auto& it : obj) push_back(it);
 		return *this;
 	}
@@ -189,8 +174,8 @@ public:
 	}
 
 private:
-	int m_size;
-	int m_capacity;
+	size_t m_size;
+	size_t m_capacity;
 	T* m_array;
 	friend std::ostream& operator<<(std::ostream& os, MyVector const& m);
 };

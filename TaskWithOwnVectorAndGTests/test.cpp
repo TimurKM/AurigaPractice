@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "MyVector.h"
 
-typedef MyVector<int> VectorType;
-//typedef std::vector<int> VectorType;
+using VectorType = MyVector<int>;
+//using VectorType = std::vector<int>;
 
 TEST(VectorTest, TestFront)
 {
@@ -69,7 +69,7 @@ TEST(VectorTest, TestAt)
 	{
 		what = exc.what();
 	}
-	EXPECT_EQ(std::string("invalid vector subscript"), what);
+	EXPECT_EQ(std::string("invalid vector<T> subscript"), what);
 }
 
 TEST(VectorTest, TestSize)
@@ -90,10 +90,10 @@ TEST(VectorTest, TestCapacity)
 	EXPECT_EQ(15, myvector.capacity());
 
 	myvector = { 1,2,3,4,5 };
-	EXPECT_EQ(5, myvector.capacity());
+	EXPECT_EQ(15, myvector.capacity());
 
 	myvector = {};
-	EXPECT_EQ(5, myvector.capacity());
+	EXPECT_EQ(0, myvector.capacity());
 }
 
 TEST(VectorTest, TestShrinkToFit)
@@ -109,7 +109,7 @@ TEST(VectorTest, TestShrinkToFit)
 	VectorType myvector2;
 	myvector2 = { 1,2,3,4,5 };
 	EXPECT_EQ(5, myvector2.size());
-	EXPECT_EQ(5, myvector2.capacity());
+	EXPECT_EQ(15, myvector2.capacity());
 
 	myvector2.shrink_to_fit();
 	EXPECT_EQ(5, myvector2.size());
@@ -174,17 +174,17 @@ TEST(VectorTest, TestResize)
 	EXPECT_EQ(100, myvector[6]);
 	EXPECT_EQ(7, myvector.size());
 
-	myvector.resize(3);
+	myvector.resize(3, 0);
 	EXPECT_EQ(3, myvector.size());
 
 	VectorType myvector2;
 	EXPECT_EQ(15, myvector2.capacity());
-	myvector2.resize(5);
-	EXPECT_EQ(100, myvector2[0]);
-	EXPECT_EQ(100, myvector2[1]);
-	EXPECT_EQ(100, myvector2[2]);
-	EXPECT_EQ(100, myvector2[3]);
-	EXPECT_EQ(100, myvector2[4]);
+	myvector2.resize(5, 0);
+	EXPECT_EQ(0, myvector2[0]);
+	EXPECT_EQ(0, myvector2[1]);
+	EXPECT_EQ(0, myvector2[2]);
+	EXPECT_EQ(0, myvector2[3]);
+	EXPECT_EQ(0, myvector2[4]);
 }
 
 TEST(VectorTest, TestDefaultConstructor)
