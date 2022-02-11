@@ -6,7 +6,7 @@
 #endif
 
 template<class T>
-class MySingleLinkedList
+class MySinglyLinkedList
 {
 	struct Node
 	{
@@ -52,46 +52,29 @@ public:
 
 	T& back()
 	{
-		/*Node* currentPtr = m_head;
-		while (currentPtr->next != nullptr)
-		{
-			currentPtr = currentPtr->next;
-		}
-		return currentPtr->data;*/
 		return m_tail->data;
 	}
 
 	void push_front(const T& value)
 	{
-		Node* tempNode = DBG_NEW Node();
-		tempNode->data = value;
-		tempNode->next = m_head;
-		m_head = tempNode;
-		if (m_head->next == nullptr)
+		Node* newHead = DBG_NEW Node({ value, m_head });
+		m_head = newHead;
+		m_size += 1;
+		if (1 == m_size)
 		{
 			m_tail = m_head;
 		}
-		m_size++;
 	}
 
 	void push_back(const T& value)
 	{
-		if (m_head == nullptr)
+		if (0 == m_size)
 		{
 			push_front(value);
 		}
 		else
 		{
-			Node* tempNode = DBG_NEW Node();
-			tempNode->data = value;
-			tempNode->next = nullptr;
-			/*Node* currentPtr = m_head;
-			while (currentPtr->next != nullptr)
-			{
-				currentPtr = currentPtr->next;
-			}
-			currentPtr->next = tempNode;*/
-			m_tail->next = tempNode;
+			m_tail->next = DBG_NEW Node({ value, nullptr });
 			m_tail = m_tail->next;
 			m_size++;
 		}
@@ -99,29 +82,28 @@ public:
 
 	void pop_front()
 	{
-		Node* tempNode = m_head;
+		Node* removal = m_head;
 		m_head = m_head->next;
-		delete tempNode;
+		delete removal;
 		m_size--;
 	}
 
 	void pop_back()
 	{
-		// Calling pop_back on an empty container results in undefined behavior. ref std::list
-		if (m_head->next == nullptr)
+		if (1 == m_size)
 		{
 			pop_front();
 		}
 		else
 		{
-			Node* tempNode = m_head;
-			while (tempNode->next->next != nullptr)
+			Node* search = m_head;
+			while (search->next != m_tail)
 			{
-				tempNode = tempNode->next;
+				search = search->next;
 			}
-			delete tempNode->next;
-			tempNode->next = nullptr;
-			m_tail = tempNode;
+			delete m_tail;
+			m_tail = search;
+			m_tail->next = nullptr;
 			m_size--;
 		}
 	}
@@ -132,6 +114,7 @@ public:
 		Node* previousPtr = nullptr;
 		Node* nextPtr = nullptr;
 
+		m_tail = m_head;
 		while (currentPtr != nullptr)
 		{
 			nextPtr = currentPtr->next;
@@ -140,100 +123,87 @@ public:
 			currentPtr = nextPtr;
 		}
 		m_head = previousPtr;
-		currentPtr = m_head;
-		while (currentPtr->next != nullptr)
-		{
-			currentPtr = currentPtr->next;
-		}
-		m_tail = currentPtr;
 	}
 
-	void resize(size_t count, const T& value = 100)
+	void resize(size_t count, const T& value = 0)
 	{
 		if (m_size == count) return;
 		else if (m_size > count)
 		{
-			if (m_head->next == nullptr)
+			if (1 == m_size) // count == 0
 			{
 				pop_front();
 			}
 			else
 			{
-				Node* currentPtr = m_head;
-				for (int i = 0; i < count - 1; i++)
+				Node* current = m_head;
+				for (size_t i = 0; i < count - 1; i++)
 				{
-					currentPtr = currentPtr->next;
+					current = current->next;
 				}
 
-				Node* tempNode = currentPtr;
-				m_tail = tempNode;
-				currentPtr = currentPtr->next;
-				tempNode->next = nullptr;
-				while (currentPtr->next != nullptr)
+				Node* temp = current;
+				m_tail = temp;
+				current = current->next;
+				temp->next = nullptr; // break the list
+				while (current->next != nullptr)
 				{
-					tempNode = currentPtr;
-					currentPtr = currentPtr->next;
-					delete tempNode;
+					temp = current;
+					current = current->next;
+					delete temp;
 				}
-				delete currentPtr;
+				delete current;
 			}
 			m_size = count;
 		}
 		else
 		{
 			int n = count - m_size;
-			if (m_head == nullptr)
+			if (0 == m_size)
 			{
 				push_front(value);
+				n--;
 			}
-			else
+			Node* current = m_tail;
+			for (int i = 0; i < n; i++)
 			{
-				Node* currentPtr = m_tail;
-				/*while (currentPtr->next != nullptr)
-				{
-					currentPtr = currentPtr->next;
-				}*/
-				for (int i = 0; i < n; i++)
-				{
-					Node* tempNode = DBG_NEW Node();
-					tempNode->data = value;
-					currentPtr->next = tempNode;
-					currentPtr = currentPtr->next;
-				}
-				m_tail = currentPtr;
-				m_size = count;
+				current->next = DBG_NEW Node({ value, nullptr });
+				current = current->next;
 			}
+			m_tail = current;
+			m_size = count;
 		}
 	}
 
-	MySingleLinkedList() = default;
+	MySinglyLinkedList() = default;
 
-	MySingleLinkedList(const MySingleLinkedList<T>& obj) // copy constructor 
+	MySinglyLinkedList(const MySinglyLinkedList<T>& obj) // copy constructor 
 	{
 		*this = obj;
 	}
 
-	MySingleLinkedList<T>& operator=(const MySingleLinkedList<T>& obj) // copy assignment
+	MySinglyLinkedList<T>& operator=(const MySinglyLinkedList<T>& obj) // copy assignment
 	{
-		dispose();
+		_destruct();
 		for (auto& it : obj) push_back(it);
 		return *this;
 	}
 
-	MySingleLinkedList<T>& operator=(const std::initializer_list<T> obj) // copy assignment
+	MySinglyLinkedList<T>& operator=(const std::initializer_list<T> obj)
 	{
-		dispose();
+		_destruct();
 		for (auto& it : obj) push_back(it);
 		return *this;
 	}
 
-	MySingleLinkedList(const MySingleLinkedList<T>&& obj) // move constructor 
+	MySinglyLinkedList(const MySinglyLinkedList<T>&& obj) // move constructor 
 	{
 		*this = obj;
 	}
 
-	MySingleLinkedList<T>& operator=(MySingleLinkedList<T>&& obj) noexcept // move assignment
+	MySinglyLinkedList<T>& operator=(MySinglyLinkedList<T>&& obj) noexcept // move assignment
 	{
+		_destruct();
 		m_size = obj.m_size;
 		m_head = obj.m_head;
 		m_tail = obj.m_tail;
@@ -243,25 +213,25 @@ public:
 		return *this;
 	}
 
-	~MySingleLinkedList()
+	~MySinglyLinkedList()
 	{
-		dispose();
+		_destruct();
 	}
 private:
-	int m_size = 0;
-	Node* m_head = nullptr;
-	Node* m_tail = nullptr;
-	void dispose()
+	void _destruct()
 	{
-		Node* currentPtr = m_head;
-		while (currentPtr != nullptr)
+		Node* current = m_head;
+		while (current != nullptr)
 		{
-			Node* tempNode = currentPtr->next;
-			delete currentPtr;
-			currentPtr = tempNode;
+			Node* removal = current->next;
+			delete current;
+			current = removal;
 		}
 		m_head = nullptr;
 		m_tail = nullptr;
 	}
 
+	size_t m_size = 0;
+	Node* m_head = nullptr;
+	Node* m_tail = nullptr;
 };

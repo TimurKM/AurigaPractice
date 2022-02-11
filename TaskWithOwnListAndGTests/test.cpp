@@ -6,52 +6,52 @@
 #include "MySingleLinkedList.h"
 #include <list>
 
-typedef MySingleLinkedList<int> MySingleLinkedListType;
-//typedef std::list<int> MySingleLinkedListType;
+using MySinglyLinkedListType = MySinglyLinkedList<int>;
+//using MySinglyLinkedListType = std::list<int>;
 
-TEST(MySingleLinkedList, TestSize)
+TEST(MySinglyLinkedList, TestSize)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	EXPECT_EQ(0, mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist2.size());
 }
 
-TEST(MySingleLinkedList, TestEmpty)
+TEST(MySinglyLinkedList, TestEmpty)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	EXPECT_TRUE(0 == mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = { 1,2,3,4,5 };
 	EXPECT_FALSE(0 == mysinglelinkedlist2.size());
 }
 
-TEST(MySingleLinkedList, TestFront)
+TEST(MySinglyLinkedList, TestFront)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(1, mysinglelinkedlist.front());
 }
 
-TEST(MySingleLinkedList, TestBack)
+TEST(MySinglyLinkedList, TestBack)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist.back());
 }
 
-TEST(MySingleLinkedList, TestPushFront)
+TEST(MySinglyLinkedList, TestPushFront)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist.push_front(1);
 	EXPECT_EQ(1, mysinglelinkedlist.size());
 	EXPECT_EQ(1, mysinglelinkedlist.front());
 	EXPECT_EQ(1, mysinglelinkedlist.back());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = { 1,2,3,4,5 };
 	mysinglelinkedlist2.push_front(0);
 	EXPECT_EQ(6, mysinglelinkedlist2.size());
@@ -59,15 +59,15 @@ TEST(MySingleLinkedList, TestPushFront)
 	EXPECT_EQ(5, mysinglelinkedlist2.back());
 }
 
-TEST(MySingleLinkedList, TestPushBack)
+TEST(MySinglyLinkedList, TestPushBack)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist.push_back(1);
 	EXPECT_EQ(1, mysinglelinkedlist.size());
 	EXPECT_EQ(1, mysinglelinkedlist.front());
 	EXPECT_EQ(1, mysinglelinkedlist.back());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = { 1,2,3,4,5 };
 	mysinglelinkedlist2.push_back(6);
 	EXPECT_EQ(6, mysinglelinkedlist2.size());
@@ -75,9 +75,9 @@ TEST(MySingleLinkedList, TestPushBack)
 	EXPECT_EQ(6, mysinglelinkedlist2.back());
 }
 
-TEST(MySingleLinkedList, TestPopFront)
+TEST(MySinglyLinkedList, TestPopFront)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	mysinglelinkedlist.pop_front();
 	EXPECT_EQ(4, mysinglelinkedlist.size());
@@ -85,9 +85,9 @@ TEST(MySingleLinkedList, TestPopFront)
 	EXPECT_EQ(5, mysinglelinkedlist.back());
 }
 
-TEST(MySingleLinkedList, TestPopBack)
+TEST(MySinglyLinkedList, TestPopBack)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	mysinglelinkedlist.pop_back();
 	EXPECT_EQ(4, mysinglelinkedlist.size());
@@ -95,83 +95,81 @@ TEST(MySingleLinkedList, TestPopBack)
 	EXPECT_EQ(4, mysinglelinkedlist.back());
 }
 
-TEST(MySingleLinkedList, TestReverse)
+TEST(MySinglyLinkedList, TestReverse)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5,6 };
 	mysinglelinkedlist.reverse();
 	EXPECT_EQ(6, mysinglelinkedlist.front());
 	EXPECT_EQ(1, mysinglelinkedlist.back());
 }
 
-TEST(MySingleLinkedList, TestResize)
+TEST(MySinglyLinkedList, TestResize)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5,6 };
 	mysinglelinkedlist.resize(4);
 	EXPECT_EQ(1, mysinglelinkedlist.front());
 	EXPECT_EQ(4, mysinglelinkedlist.back());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = { 1,2,3,4,5,6 };
 	mysinglelinkedlist2.resize(8);
 	EXPECT_EQ(1, mysinglelinkedlist2.front());
-	EXPECT_EQ(100, mysinglelinkedlist2.back());
+	EXPECT_EQ(0, mysinglelinkedlist2.back());
 }
 
-TEST(MySingleLinkedList, TestDefaultConstructor)
+TEST(MySinglyLinkedList, TestDefaultConstructor)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	EXPECT_EQ(0, mysinglelinkedlist.size());
 }
 
-TEST(MySingleLinkedList, TestCopyConstructor)
+TEST(MySinglyLinkedList, TestCopyConstructor)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2(mysinglelinkedlist);
+	MySinglyLinkedListType mysinglelinkedlist2(mysinglelinkedlist);
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 }
 
-TEST(MySingleLinkedList, TestCopyAssignment)
+TEST(MySinglyLinkedList, TestCopyAssignment)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = mysinglelinkedlist;
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 }
 
-TEST(MySingleLinkedList, TestMoveConstructor)
+TEST(MySinglyLinkedList, TestMoveConstructor)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = std::move(mysinglelinkedlist);
 	EXPECT_EQ(5, mysinglelinkedlist2.size());
 }
 
-TEST(MySingleLinkedList, TestMoveAssignment)
+TEST(MySinglyLinkedList, TestMoveAssignment)
 {
-	MySingleLinkedListType mysinglelinkedlist;
+	MySinglyLinkedListType mysinglelinkedlist;
 	mysinglelinkedlist = { 1,2,3,4,5 };
 	EXPECT_EQ(5, mysinglelinkedlist.size());
 
-	MySingleLinkedListType mysinglelinkedlist2;
+	MySinglyLinkedListType mysinglelinkedlist2;
 	mysinglelinkedlist2 = std::move(mysinglelinkedlist);
 	EXPECT_EQ(5, mysinglelinkedlist2.size());
 }
 
 int main(int argc, char** argv)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	std::cout << "All tests are successful" << std::endl;
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
@@ -179,6 +177,7 @@ int main(int argc, char** argv)
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	_CrtDumpMemoryLeaks();
+
+	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }
