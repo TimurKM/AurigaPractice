@@ -1,42 +1,40 @@
 ﻿#include <iostream>
 #include <vector>
+#include <ostream>
 #include <fstream>
-#include <iterator>
 
 namespace
 {
-	void printInConsole(const std::vector<int>& vector)
+	using userVector = std::vector<int>&;
+
+	void resultPrint(const userVector vector, std::ostream& destination)
 	{
 		for (size_t i = 0; i < vector.size(); ++i)
 		{
 			if ((i + 1) % 3 == 0)
 			{
-				std::cout << vector[i] << std::endl;
+				destination << vector[i] << std::endl;
 			}
 			else
 			{
-				std::cout << vector[i] << ' ';
+				destination << vector[i] << ' ';
 			}
 		}
 	}
 
-	void writeInFile(const std::vector<int>& vector)
+	void printInConsole(const userVector vector)
+	{
+		resultPrint(vector, std::cout);
+	}
+
+	void writeInFile(const userVector vector)
 	{
 		std::ofstream output_file("Test1.txt");
-		for (size_t i = 0; i < vector.size(); ++i)
-		{
-			if ((i + 1) % 3 == 0)
-			{
-				output_file << vector[i] << std::endl;
-			}
-			else
-			{
-				output_file << vector[i] << ' ';
-			}
-		}
+
+		resultPrint(vector, output_file);
 	}
 
-	void selectWayOfWriting(const std::vector<int>& vector, void (*wayPtr)(const std::vector<int>&) = printInConsole)
+	void selectWayOfWriting(const userVector vector, void (*wayPtr)(const userVector) = printInConsole)
 	{
 		if (wayPtr)
 		{
@@ -48,7 +46,7 @@ namespace
 		}
 	}
 
-	void getUserInput(std::vector<int>& vector, int& userChoice)
+	void getUserInput(userVector vector, int& userChoice)
 	{
 		auto buffer = 0;
 
@@ -74,7 +72,7 @@ int main()
 {
 	std::vector<int> data;
 	auto userChoice = 0;
-	void (*fcnPtr)(const std::vector<int>&) = nullptr;
+	void (*fcnPtr)(const userVector) = nullptr;
 
 	getUserInput(data, userChoice);
 
@@ -86,17 +84,8 @@ int main()
 	{
 		fcnPtr = writeInFile;
 	}
-	else
-	{
-		return 0;
-	}
 
-	if (fcnPtr)
-	{
-		selectWayOfWriting(data, fcnPtr);
-	}
-	else
-	{
-		std::cout << "FcnPtr is nullptr" << std::endl;
-	}
+	selectWayOfWriting(data, fcnPtr);
+
+	return 0;
 }
