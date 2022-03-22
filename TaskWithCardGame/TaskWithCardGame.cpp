@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <array>
 #include <ctime> // для time()
-#include <cstdlib> // для rand() и srand()
+#include <random>
 
 namespace
 {
@@ -42,18 +42,12 @@ namespace
 
 	void printCard(const Card& card)
 	{
-		std::array<std::string, 4> arraySuits = { "C", "D", "H", "S" };
-		std::array<std::string, 13> arrayValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10","J", "Q", "K","A" };
+		const std::array<std::string, static_cast<int>(CardSuit::MAX_SUITS)> arraySuits = { "C", "D", "H", "S" };
+		const std::array<std::string, static_cast<int>(CardValue::MAX_VALUES)> arrayValues = { "2", "3", "4", "5", "6", "7", "8", "9", "10","J", "Q", "K","A" };
 
-		/*for (size_t i = 0; i < arraySuits.size(); i++)
-		{
-			for (size_t j = 0; j < arrayValues.size(); j++)
-			{
-				std::cout << arraySuits[i] << arrayValues[j] << std::endl;
-			}
-		}*/
+		std::cout << arraySuits[static_cast<int>(card.suit)] << arrayValues[static_cast<int>(card.value)] << std::endl;
 
-		switch (card.suit)
+		/*switch (card.suit)
 		{
 		case CardSuit::CLUBS:
 			std::cout << "C";
@@ -114,7 +108,7 @@ namespace
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 
 	void printDeck(const std::array<Card, numberOfCards>& deck)
@@ -122,7 +116,6 @@ namespace
 		for (const auto& card : deck)
 		{
 			printCard(card);
-			std::cout << ' ' << std::endl;
 		}
 	}
 
@@ -131,18 +124,15 @@ namespace
 		std::swap(card1, card2);
 	}
 
-	int getRandomNumber(int min, int max)
-	{
-		static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
-		return static_cast<int>(std::rand() * fraction * (max - min + 1) + min);
-	}
-
 	void shuffleDeck(std::array<Card, numberOfCards>& deck)
 	{
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist(0, 51);
+
 		for (size_t i = 0; i < numberOfCards; ++i)
 		{
-			auto swapIndex = getRandomNumber(0, 51);
-
+			auto swapIndex = dist(rng);
 			swapCards(deck[i], deck[swapIndex]);
 		}
 	}
@@ -150,7 +140,21 @@ namespace
 	int getCardValue(const Card& card)
 	{
 		auto value = 0;
-		switch (card.value)
+
+		if (static_cast<int>(card.value) + 2 < 10)
+		{
+			value = static_cast<int>(card.value) + 2;
+		}
+		else if (static_cast<int>(card.value) < static_cast<int>(CardValue::ACE))
+		{
+			value = 10;
+		}
+		else
+		{
+			value = 11;
+		}
+
+		/*switch (card.value)
 		{
 		case CardValue::TWO:
 			value = 2;
@@ -187,7 +191,7 @@ namespace
 			break;
 		default:
 			break;
-		}
+		}*/
 
 		return value;
 	}
@@ -195,11 +199,7 @@ namespace
 
 int main()
 {
-	std::srand(std::time(0));
-	std::rand();
-
 	std::array<Card, numberOfCards> deck;
-
 
 	for (size_t suit = 0, cardCounter = 0; suit < static_cast<int>(CardSuit::MAX_SUITS); ++suit)
 	{
