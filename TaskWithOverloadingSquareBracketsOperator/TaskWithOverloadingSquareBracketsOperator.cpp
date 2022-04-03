@@ -3,7 +3,7 @@
 
 struct StudentGrade
 {
-	std::string name = "";
+	std::string name;
 	char grade = 'A';
 };
 
@@ -12,10 +12,9 @@ class GradeMap
 private:
 	std::vector<StudentGrade> m_map;
 public:
-	GradeMap()
-	{
+	GradeMap() = default;
 
-	}
+	~GradeMap() = default;
 
 	char& operator[] (const std::string& name);
 };
@@ -29,9 +28,8 @@ char& GradeMap::operator[] (const std::string& name)
 			return element.grade;
 		}
 	}
-	StudentGrade temp = { name, ' ' };
 
-	m_map.push_back(temp);
+	m_map.push_back({ name, ' ' });
 
 	return m_map.back().grade;
 }
