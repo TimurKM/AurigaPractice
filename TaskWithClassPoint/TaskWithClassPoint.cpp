@@ -12,7 +12,7 @@ public:
 
 	}
 
-	void print()
+	void print() const
 	{
 		std::cout << "Point(" << m_a << ", " << m_b << ")" << std::endl;
 	}
