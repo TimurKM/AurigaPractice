@@ -7,7 +7,7 @@ Vector3D::Vector3D(double x, double y, double z)
 
 }
 
-void Vector3D::print()
+void Vector3D::print() const
 {
 	std::cout << "Vector(" << m_x << " , " << m_y << " , " << m_z << ")\n";
 }

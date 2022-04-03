@@ -5,12 +5,14 @@ class Vector3D;
 class Point3D
 {
 private:
-	double m_x, m_y, m_z;
+	double m_x = 0.0;
+	double m_y = 0.0;
+	double m_z = 0.0;
 
 public:
 	Point3D(double x = 0.0, double y = 0.0, double z = 0.0);
 
-	void print();
+	void print() const;
 
 	void moveByVector(const Vector3D& v);
 };

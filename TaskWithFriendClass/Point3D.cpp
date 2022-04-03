@@ -8,7 +8,7 @@ Point3D::Point3D(double x, double y, double z)
 
 }
 
-void Point3D::print()
+void Point3D::print() const
 {
 	std::cout << "Point(" << m_x << " , " << m_y << " , " << m_z << ")\n";
 }
