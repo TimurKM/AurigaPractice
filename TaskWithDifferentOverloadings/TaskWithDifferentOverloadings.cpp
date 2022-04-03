@@ -3,37 +3,34 @@
 class IntArray
 {
 private:
-	int m_length = 0;
+	size_t m_length = 0;
 
 	int* m_array = nullptr;
 public:
-	IntArray(int length) : m_length(length)
+	IntArray(size_t length) : m_length(length)
 	{
-		if (length > 0)
+		try
 		{
-			m_array = new int[length];
+			m_array = new int[m_length];
 		}
-		else
+		catch (std::exception& err)
 		{
-			std::cout << "Length should be positive" << std::endl;
+			std::cout << err.what() << std::endl;
 		}
 
 	}
 
 	IntArray(const IntArray& intArray) :m_length(intArray.m_length)
 	{
-		if (intArray.m_array)
+		try
 		{
 			m_array = new int[m_length];
 
-			for (int i = 0; i < m_length; ++i)
-			{
-				m_array[i] = intArray.m_array[i];
-			}
+			memcpy(m_array, intArray.m_array, sizeof(m_array[0]) * m_length);
 		}
-		else
+		catch (const std::exception& err)
 		{
-			m_array = nullptr;
+			std::cout << err.what() << std::endl;
 		}
 	}
 
@@ -58,9 +55,11 @@ IntArray& IntArray::operator= (const IntArray& intArray)
 
 	delete[] m_array;
 
+	m_array = nullptr;
+
 	m_length = intArray.m_length;
 
-	if (intArray.m_array)
+	if (intArray.m_array != nullptr)
 	{
 		m_array = new int[m_length];
 
@@ -68,10 +67,6 @@ IntArray& IntArray::operator= (const IntArray& intArray)
 		{
 			m_array[i] = intArray.m_array[i];
 		}
-	}
-	else
-	{
-		m_array = nullptr;
 	}
 
 	return *this;
@@ -115,13 +110,14 @@ IntArray fillArray()
 int main()
 {
 	IntArray a = fillArray();
-	std::cout << a << '\n';
+
+	std::cout << a << std::endl;
 
 	IntArray b(1);
 	a = a;
 	b = a;
 
-	std::cout << b << '\n';
+	std::cout << b << std::endl;
 
 	return 0;
 }
