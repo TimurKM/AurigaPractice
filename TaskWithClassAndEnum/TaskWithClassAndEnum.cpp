@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <time.h>
+#include <random>
 
 class Monster
 {
@@ -24,38 +25,9 @@ public:
 
 	std::string getTypeString()
 	{
-		std::string type;
-		switch (m_type)
-		{
-		case Monster::MonsterType::DRAGON:
-			type = "Dragon";
-			break;
-		case Monster::MonsterType::GOBLIN:
-			type = "Goblin";
-			break;
-		case Monster::MonsterType::OGRE:
-			type = "Ogre";
-			break;
-		case Monster::MonsterType::ORC:
-			type = "Orc";
-			break;
-		case Monster::MonsterType::SKELETON:
-			type = "Skeleton";
-			break;
-		case Monster::MonsterType::TROLL:
-			type = "Troll";
-			break;
-		case Monster::MonsterType::VAMPIRE:
-			type = "Vampire";
-			break;
-		case Monster::MonsterType::ZOMBIE:
-			type = "Zombie";
-			break;
-		default:
-			break;
-		}
+		const std::string s_names[static_cast<int>(MonsterType::MAX_MONSTER_TYPES)]{ "Dragon", "Goblin", "Ogre", "Orc", "Skeleton", "Troll", "Vampire", "Zombie" };
 
-		return type;
+		return s_names[static_cast<int>(m_type)];
 	}
 
 	void print()
@@ -64,7 +36,7 @@ public:
 	}
 private:
 	MonsterType m_type = MonsterType::MAX_MONSTER_TYPES;
-	std::string m_name = "Jack";
+	std::string m_name = "";
 	int m_health = 50;
 };
 
@@ -73,27 +45,25 @@ class MonsterGenerator
 public:
 	static Monster generateMonster()
 	{
-		Monster::MonsterType type = static_cast<Monster::MonsterType>(getRandomNumber(0, static_cast<int>(Monster::MonsterType::MAX_MONSTER_TYPES)));
+		std::random_device dev;
+		std::mt19937 rng(dev());
+		std::uniform_int_distribution<std::mt19937::result_type> dist1(0, static_cast<int>(Monster::MonsterType::MAX_MONSTER_TYPES) - 1);
+		std::uniform_int_distribution<std::mt19937::result_type> dist2(0, 100);
 
-		int health = getRandomNumber(1, 100);
+		Monster::MonsterType type = static_cast<Monster::MonsterType>(dist1(rng));
 
-		static std::string s_names[6]{ "John", "Brad", "Alex", "Ron", "Hulk", "Asnee" };
+		int health = dist2(rng);
 
-		return Monster(type, s_names[getRandomNumber(0, 5)], health);
-	}
+		static const std::string s_names[]{ "John", "Brad", "Alex", "Ron", "Hulk", "Asnee" };
 
-	static int getRandomNumber(int min, int max)
-	{
-		static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
-		return static_cast<int>(rand() * fraction * (max - min + 1) + min);
+		std::uniform_int_distribution<std::mt19937::result_type> dist3(0, (std::size(s_names) - 1));
+
+		return Monster(type, s_names[dist3(rng)], health);
 	}
 };
 
 int main()
 {
-	srand(static_cast<unsigned int>(time(0)));
-	rand();
-
 	Monster m = MonsterGenerator::generateMonster();
 
 	m.print();
