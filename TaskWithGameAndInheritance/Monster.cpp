@@ -22,16 +22,16 @@ Monster* Monster::getRandomMonster()
 	return monster;
 }
 
-void Monster::attackPlayer(Player& player)
+void Monster::attack(Player& player)
 {
-	if (this->isDead() == true)
+	if (isDead() == true)
 	{
 		return;
 	}
 
-	player.reduceHealth(this->getDamage());
+	player.reduceHealth(getDamage());
 
-	std::cout << "The " << this->getName() << " hit you for " << this->getDamage() << " damage" << std::endl;
+	std::cout << "The " << getName() << " hit you for " << getDamage() << " damage" << std::endl;
 }
 
 Monster::MonsterData Monster::monsterData[static_cast<int>(Type::Max_types)]

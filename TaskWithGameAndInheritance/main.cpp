@@ -22,7 +22,7 @@ int main()
 
 		while (!player->isDead() && !player->hasWon())
 		{
-			player->fightMonster();
+			player->fight();
 		}
 
 		if (player->isDead())

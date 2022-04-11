@@ -24,34 +24,34 @@ bool Player::hasWon() const
 	return (m_level >= 10) ? true : false;
 }
 
-void Player::attackMonster(Monster& monster)
+void Player::attack(Monster& monster)
 {
-	if (this->isDead() == true)
+	if (isDead() == true)
 	{
 		return;
 	}
 
-	std::cout << "You hit the " << monster.getName() << " for " << this->getDamage() << " damage" << std::endl;
+	std::cout << "You hit the " << monster.getName() << " for " << getDamage() << " damage" << std::endl;
 
-	monster.reduceHealth(this->getDamage());
+	monster.reduceHealth(getDamage());
 
 	if (monster.isDead() == true)
 	{
 		std::cout << "You killed the " << monster.getName() << std::endl;
-		this->levelUp();
-		std::cout << "You are now level " << this->getLevel() << std::endl;
+		levelUp();
+		std::cout << "You are now level " << getLevel() << std::endl;
 		std::cout << "You found " << monster.getGold() << " gold." << std::endl;
-		this->addGold(monster.getGold());
+		addGold(monster.getGold());
 	}
 }
 
-void Player::fightMonster()
+void Player::fight()
 {
 	Monster* monster = Monster::getRandomMonster();
 
 	std::cout << "You have encountered a " << monster->getName() << " (" << monster->getSymbol() << ")." << std::endl;
 
-	while (!this->isDead() && !monster->isDead())
+	while (!isDead() && !monster->isDead())
 	{
 		std::cout << "(R)un or (F)ight: ";
 
@@ -70,20 +70,20 @@ void Player::fightMonster()
 			if (escape == 0)
 			{
 				std::cout << "You didn't successfully flee" << std::endl;
-				monster->attackPlayer(*this);
+				monster->attack(*this);
 				continue;
 			}
 			else
 			{
 				std::cout << "You successfully fled" << std::endl;
-				return;
+				break;
 			}
 		}
 
 		if (choice == 'F' || choice == 'f')
 		{
-			this->attackMonster(*monster);
-			monster->attackPlayer(*this);
+			attack(*monster);
+			monster->attack(*this);
 		}
 	}
 

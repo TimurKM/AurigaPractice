@@ -18,7 +18,7 @@ public:
 
 	bool hasWon() const;
 
-	void attackMonster(Monster& monster);
+	void attack(Monster& monster);
 
-	void fightMonster();
+	void fight();
 };

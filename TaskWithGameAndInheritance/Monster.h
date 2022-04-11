@@ -32,5 +32,5 @@ public:
 
 	static Monster* getRandomMonster();
 
-	void attackPlayer(Player& player);
+	void attack(Player& player);
 };
