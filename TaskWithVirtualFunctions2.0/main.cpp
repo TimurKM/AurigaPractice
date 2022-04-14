@@ -37,18 +37,18 @@ std::vector<Circle*> getLargestCircle(const std::vector<Shape*>& vector)
 
 		if (circle != nullptr)
 		{
-			if (largestCircle == nullptr || circle->getRadius() > largestCircle->getRadius())
+			if (largestCircle == nullptr || *circle > * largestCircle)
 			{
+				largestCircles.clear();
 				largestCircle = circle;
+				largestCircles.push_back(largestCircle);
 			}
-			else if (circle->getRadius() == largestCircle->getRadius())
+			else if (*circle == *largestCircle)
 			{
 				largestCircles.push_back(circle);
 			}
 		}
-
 	}
-	largestCircles.push_back(largestCircle);
 
 	return largestCircles;
 }
@@ -56,8 +56,11 @@ std::vector<Circle*> getLargestCircle(const std::vector<Shape*>& vector)
 int main()
 {
 	std::vector<Shape*> vector;
-	vector.push_back(new Circle(Point(1, 2, 3), 7));
 	vector.push_back(new Triangle(Point(1, 2, 3), Point(4, 5, 6), Point(7, 8, 9)));
+	vector.push_back(new Circle(Point(4, 5, 6), 3));
+	vector.push_back(new Circle(Point(4, 5, 6), 3));
+	vector.push_back(new Circle(Point(4, 5, 6), 3));
+	vector.push_back(new Circle(Point(1, 2, 3), 7));
 	vector.push_back(new Circle(Point(4, 5, 6), 3));
 	vector.push_back(new Circle(Point(7, 8, 9), 6));
 	vector.push_back(new Circle(Point(1, 5, 6), 2));
@@ -84,9 +87,9 @@ int main()
 		std::cout << "There are no circles in vector" << std::endl;
 	}*/
 
-	std::vector<Circle*> largestCircles = getLargestCircle(vector);
+	const auto largestCircles = getLargestCircle(vector);
 
-	if (largestCircles[0] != nullptr)
+	if (!largestCircles.empty())
 	{
 		for (const auto& element : largestCircles)
 		{

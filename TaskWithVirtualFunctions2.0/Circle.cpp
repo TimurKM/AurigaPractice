@@ -16,3 +16,33 @@ int Circle::getRadius() const
 {
 	return m_radius;
 }
+
+bool operator== (const Circle& circle1, const Circle& circle2)
+{
+	return circle1.m_radius == circle2.m_radius;
+}
+
+bool operator!= (const Circle& circle1, const Circle& circle2)
+{
+	return !(circle1.m_radius == circle2.m_radius);
+}
+
+bool operator> (const Circle& circle1, const Circle& circle2)
+{
+	return circle1.m_radius > circle2.m_radius;
+}
+
+bool operator>= (const Circle& circle1, const Circle& circle2)
+{
+	return circle1.m_radius >= circle2.m_radius;
+}
+
+bool operator< (const Circle& circle1, const Circle& circle2)
+{
+	return circle1.m_radius < circle2.m_radius;
+}
+
+bool operator<= (const Circle& circle1, const Circle& circle2)
+{
+	return circle1.m_radius <= circle2.m_radius;
+}

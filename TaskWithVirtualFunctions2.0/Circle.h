@@ -15,4 +15,13 @@ public:
 	int getRadius() const;
 
 	virtual ~Circle() = default;
+
+	friend bool operator== (const Circle& circle1, const Circle& circle2);
+	friend bool operator!= (const Circle& circle1, const Circle& circle2);
+
+	friend bool operator> (const Circle& circle1, const Circle& circle2);
+	friend bool operator<= (const Circle& circle1, const Circle& circle2);
+
+	friend bool operator< (const Circle& circle1, const Circle& circle2);
+	friend bool operator>= (const Circle& circle1, const Circle& circle2);
 };
