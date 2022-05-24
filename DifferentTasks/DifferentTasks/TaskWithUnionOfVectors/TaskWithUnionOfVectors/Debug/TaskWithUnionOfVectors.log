@@ -1,0 +1,7 @@
+﻿  TaskWithUnionOfVectors.cpp
+C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\TaskWithUnionOfVectors\TaskWithUnionOfVectors.cpp(119,12): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\TaskWithUnionOfVectors\TaskWithUnionOfVectors.cpp(119,25): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\TaskWithUnionOfVectors\TaskWithUnionOfVectors.cpp(121,10): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\TaskWithUnionOfVectors\TaskWithUnionOfVectors.cpp(121,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\TaskWithUnionOfVectors\TaskWithUnionOfVectors.cpp(132,15): warning C4018: <: несоответствие типов со знаком и без знака
+  TaskWithUnionOfVectors.vcxproj -> C:\Users\Пользователь\Desktop\back up projects\TaskWithUnionOfVectors\Debug\TaskWithUnionOfVectors.exe
